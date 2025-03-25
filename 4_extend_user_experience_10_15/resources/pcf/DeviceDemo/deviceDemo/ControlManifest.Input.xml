@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="deviceDemo" constructor="deviceDemo" version="0.1.0" display-name-key="deviceDemo" description-key="deviceDemo description" control-type="standard" >
+    <external-service-usage enabled="false"></external-service-usage>
+
+    <property name="capturedValue" display-name-key="Captured Value" description-key="Value captured from user device" of-type="Multiple" usage="output" default-value="" required="true" />
+    <property name="errorMessage" display-name-key="Error Message" description-key="Error message" of-type="Multiple" default-value="" usage="output" required="true" />
+    <property name="capturedValueSource" display-name-key="Captured Value Source" description-key="Source of captured value" of-type="Multiple" default-value="None" usage="output" required="true" />
+
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="css/device-demo.css" order="1" />
+    </resources>
+
+    <feature-usage>
+      <uses-feature name="Device.captureAudio" required="false" />
+      <uses-feature name="Device.captureImage" required="false" />
+      <uses-feature name="Device.captureVideo" required="false" />
+      <uses-feature name="Device.getBarcodeValue" required="false" />
+      <uses-feature name="Device.getCurrentPosition" required="false" />
+      <uses-feature name="Device.pickFile" required="false" />
+    </feature-usage>
+
+  </control>
+</manifest>

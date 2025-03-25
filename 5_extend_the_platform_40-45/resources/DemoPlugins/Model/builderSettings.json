@@ -1,0 +1,25 @@
+{
+"emitEntityETC": true,
+"emitFieldsClasses": true,
+"emitVirtualAttributes": false,
+"entityNamesFilter": [
+   "account",
+   "contact"
+],
+"entityTypesFolder": "Entities",
+"generateGlobalOptionSets": true,
+"generateSdkMessages": true,
+"language": "CS",
+"logLevel": "Off",
+"messageNamesFilter": [
+   "searchautocomplete",
+   "searchquery",
+   "sample_*"
+],
+"messagesTypesFolder": "Messages",
+"namespace": "DemoPlugins.Model",
+"optionSetsTypesFolder": "OptionSets",
+"serviceContextName": "OrgContext",
+"suppressGeneratedCodeAttribute": true,
+"suppressINotifyPattern": true
+}

@@ -1,0 +1,11 @@
+**/*.snk
+**/*.vs
+**/bin
+**/obj
+
+
+**/Entities
+**/Messages
+**/OptionSets
+**/EntityOptionSetEnum.cs
+**/OrgContext.cs
