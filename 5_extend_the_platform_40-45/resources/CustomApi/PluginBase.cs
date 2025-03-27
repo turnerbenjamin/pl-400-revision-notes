@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using Microsoft.Xrm.Sdk;
 
-namespace DemoPlugins
+namespace CustomApi
 {
     public abstract class PluginBase : IPlugin
     {

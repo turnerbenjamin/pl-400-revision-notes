@@ -32,8 +32,11 @@ perform some business logic and return a result.
 
 ### Create a Custom API
 
-There are various ways to create a custom API but the simplest is to use the
-PRT.
+There are various ways to create a custom API:
+
+- Register with PRT
+- Power apps maker portal (Solution -> New -> More -> Other -> Custom API)
+- Code
 
 Note, the custom api and any input/output parameters will be customisable by
 default. It is recommended that we change this to false so that it cannot be
@@ -47,6 +50,11 @@ The metadata for custom apis is stored in the following Tables:
 - Custom API
 - Custom API Request Parameter
 - Custom API Response Parameter
+
+## Creating a Custom API with PRT
+
+This is straight forward, select Register -> Custom API. We can set various
+properties when defining the API:
 
 ### Step Types
 
@@ -106,19 +114,32 @@ Actions use POST:
 - They can be enabled for workflow
 - There is no requirement to return data.
 
-## Making
+### Making APIs Private
 
-### What we Need to Know (Custom API Message)
+We can make Custom APIs private, this will keep the API out of the metadata
+service document. While this will flag that the API should not be used it does
+not prevent other developers using the message if they have awareness of it.
 
-- Allows us to build new messages in the pipeline
-- Define the API, request parameters and response parameters
-- They may be global or bound to a table
-- May be called from code or power automate
+We can add some security by adding an Execute Privilege property.
 
-- create with
-  - Maker portal
-  - PRT
-  - Code
+### Input/Output Parameters
+
+There's not much to say here, we can define input and output parameters. Just
+remember that:
+
+- A function must have at least on output parameter
+- Input parameters for a function are passed as a query string which can be
+limiting
+
+## Implement Business Logic for a Custom API with a Plug-in
+
+## Invoking the Custom Message
+
+### Invoking with a Plug-In
+
+### Invoking with Power Automate
+
+### Invoking with Web Api
 
 ## Develop a Plugin that Implements a Custom API
 
