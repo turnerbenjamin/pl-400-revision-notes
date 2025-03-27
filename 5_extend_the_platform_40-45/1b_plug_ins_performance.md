@@ -151,7 +151,9 @@ We can check the transaction depth with:
 context.Depth
 ```
 
-This can be used to detect infinite loops.
+This can be used to detect infinite loops. For instance, we may throw an error
+if depth exceeds a certain value so that problematic implementations may be
+fixed.
 
 ## Performance Analysis
 

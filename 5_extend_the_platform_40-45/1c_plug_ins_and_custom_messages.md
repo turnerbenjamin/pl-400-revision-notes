@@ -20,9 +20,14 @@ We can define a name for the action and also any input/output arguments.
 A custom process action is a workflow, we can define steps and actions to
 execute business logic when the message is called.
 
-Alternatively, a common pattern is to create a custom process action without any
-steps and to register a plug-in step against the message to perform the logic.
-Once the action has been created we are able to access the message from the PRT.
+MS recommend avoiding this method for creating custom business events. This is
+because:
+
+- As with other workflows they can be disabled in the UI
+- It is less intuitive to prevent developers from registering synchronous steps
+against the message
+
+Instead, we should use:
 
 ## Custom APIs
 
@@ -30,7 +35,15 @@ Custom APIs are an alternative to custom process actions. These may be created
 without a plug-in to pass data about an event, but generally a plugin is used to
 perform some business logic and return a result.
 
-### Create a Custom API
+## Custom API Tables
+
+The metadata for custom apis is stored in the following Tables:
+
+- Custom API
+- Custom API Request Parameter
+- Custom API Response Parameter
+
+## Create a Custom API - Overview
 
 There are various ways to create a custom API:
 
@@ -42,14 +55,6 @@ Note, the custom api and any input/output parameters will be customisable by
 default. It is recommended that we change this to false so that it cannot be
 modified when exported as a managed solution. Find the Api and params in the
 solution, select the kebab menu and edit the managed properties.
-
-### Custom API Tables
-
-The metadata for custom apis is stored in the following Tables:
-
-- Custom API
-- Custom API Request Parameter
-- Custom API Response Parameter
 
 ## Creating a Custom API with PRT
 
@@ -131,35 +136,33 @@ remember that:
 - Input parameters for a function are passed as a query string which can be
 limiting
 
-## Implement Business Logic for a Custom API with a Plug-in
+## Custom API Business Logic
 
-## Invoking the Custom Message
+We can attach business logic to a custom API by:
 
-### Invoking with a Plug-In
+- Attaching a plug-in to the custom API
+- Registering a plugin step against the custom API message
+- Listening for the message with a Power Automate Flow
 
-### Invoking with Power Automate
+Generally, a plug-in is attached to the custom API. However note that:
 
-### Invoking with Web Api
+- The profiler cannot be used for debugging as a profiler is connected to a step
+- Secure and unsecure configurations cannot be set
 
-## Develop a Plugin that Implements a Custom API
+In both cases the workaround is to choose the second option, register the plugin
+against the custom api message.
 
-### What we Need to Know (Custom API Plugin)
+## Triggering a Custom API Message
 
-- Add plug-in to perform logic when custom API called
-- Register the assembly
-- Rather than register a step, link plugin assembly to the custom API
+Again, there are multiple ways to trigger a custom API message.
 
-## Configure Dataverse Business Events
+- Use a bound action in a power automate flow
+- Trigger from a plugin
 
-### What we Need to Know (Events)
+```cs
+var req = new OrganizationRequest(customApiName)
+```
 
-Historically plug-ins used for create and update of records. But we may have
-multiple events at once, e.g. an invoice with various line items.
+The resources contain a demonstration of custom apis:
 
-We can use business events, e.g. post invoice. There is a catalogue of events
-from which we can choose.
-
-We can then handle a single transaction with a single event which simplifies the
-logic.
-
-We need to look into this.
+[demo](./resources/CustomApi/custom_api_demo.md)

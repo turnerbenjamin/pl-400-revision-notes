@@ -34,7 +34,7 @@ Business rules allow us to write simple server-side logic. However, if the logic
 becomes more complex, e.g. where a switch statement is preferable to a lengthy
 if, else if, else sequence, we may determine that a plug-in is more appropriate.
 
-### Plug-ins Vs Workflows
+### Plug-ins Vs Workflows/Custom Actions
 
 Workflows are a declarative workflow that can run either synchronously or
 asynchronously.
@@ -47,8 +47,6 @@ The main limitations of workflows in relation to plugins are:
 
 On the other hand, unlike plugins, workflows can be triggered on demand.
 
-[MS Learn](https://learn.microsoft.com/en-us/power-automate/bpf-add-on-demand-workflow)
-
 ### Power Automate Flows
 
 Power Automate flows may be considered an alternative to asynchronous plug-ins.
@@ -58,11 +56,43 @@ Power Automate flows have the benefit of not requiring development experience.
 They can be less performant than plug-ins but the difference in performance is
 becoming increasingly small.
 
-### Custom Actions
+### Formula, Calculated and Roll-Up Columns
 
-### Calculated and Roll-Up Fields
+Where these fit the use case, they are simple and performant ways to implement
+logic. However, they all have limitations and, in the case of rollup columns,
+a fairly specific use case.
 
-### Azure Service Bus Integration
+#### Calculated Columns
+
+These columns are used to perform calculations, we can specify conditions and
+actions. In the action section we can define a calculation using data in the
+table and related tables.
+
+This feature is being deprecated in favour of formula type columns
+
+#### Formula Columns
+
+Similar to calculated columns, we can perform real time calculations on data in
+the table and related tables. Unlike Calculated columns, formulas are expressed
+in PowerFx.
+
+Both calculated and formula columns have limitations, for instance:
+
+- Neither can have cyclical references
+- Sorting is disabled where there is reference to another table, a logical or
+calculated column or Now/UtcNow is used
+- There is a maximum depth of 5 and 10 respectively
+
+#### Rollup Columns
+
+These are used to aggregate data from a related table. For instance, an account
+table might have a 1:N relationship with an expenses table. We could use a
+rollup column to display a total of all related expenses in the account column.
+
+Unlike calculated and formula columns, these run on a schedule (default is every
+12 hours)
+
+### Azure Capabilities
 
 Plug-ins and workflows are not designed for batch processing. They should not
 be used for long-running or high volume actions. We should offload such
