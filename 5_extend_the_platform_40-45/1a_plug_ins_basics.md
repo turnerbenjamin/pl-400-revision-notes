@@ -6,13 +6,6 @@ Plugins allow us to run dotnet code in response to Dataverse triggers. These are
 efficient and powerful but they require developer skills and can detriment
 performance if poorly written.
 
-We should consider alternatives such as:
-
-- Power Automate Flows
-- Custom Actions
-- Calculated and Roll-Up Fields
-- Azure Service Bus Integration and Webhooks
-
 ## Scaffolding a Plugin
 
 We can use:
@@ -24,13 +17,13 @@ Note the plugin base class in resources was not generated with pac. It is a
 simple class used to share common boilerplate error handling logic between the
 various demo plugins in the assembly.
 
-If using VS use the class library template.
-
-Note that we must use .NET 4.6.2 to write plug-ins
+Note that we must use .NET 4.6.2 to write plug-ins:
 
 ```xml
 <TargetFramework>net462</TargetFramework>
 ```
+
+So, no global usings, nullable types or file-scoped namespaces.
 
 ### Required Packages
 
@@ -71,8 +64,7 @@ serviceProvider.GetService(typeof(ITracingService))
 ```
 
 GetService returns an Object or null. We need to cast the return value to the
-appropriate type and perform null checks before using. This can be seen from
-usage in the resources for this section.
+appropriate type and perform null checks before using.
 
 In the resources, this boilerplate code is contained in a base class:
 
@@ -93,6 +85,8 @@ We can use this to access
 - primary entity name and id
 - stage (i.e. pipeline stage)
 
+Both IPluginExecutionContext and IWorkflowContext implement IExecutionContext.
+
 #### Input Parameters
 
 With regards to input parameters, there will be a Target key for most messages
@@ -106,6 +100,17 @@ The entity returned contains key value pairs with the key being the logical
 column name. It will not include all properties, just those that will change. If
 we need access to additional properties then we will need to use pre/post
 images.
+
+#### Output and Shared Parameters
+
+We can also use:
+
+- Output parameters: Return values from the plugin
+- Shared Variables: Persist data between plugin steps
+
+Note: We can only use output parameters in the postOperation Stage.
+Note: Shared variables may be useful in certain situations but plugins should
+generally be stateless
 
 #### Pre/Post Images
 
@@ -153,6 +158,10 @@ assemblies. We should use the Organisation Service in this context.
 
 Note the Organisation Service does (or at least will) utilise Web Api under the
 hood.
+
+Note: At this point WebApi requests should NEVER be used in plugins.
+IOrganisationService methods allow for the transaction context to be passed
+enabling the operation to make requests within the pipeline transaction.
 
 #### Instantiating IOrganisationService
 
@@ -257,132 +266,175 @@ There is also an EntityReference class which has the same overload signatures.
 This is used when we need to reference an Entity and do not require access to
 its attributes.
 
-We can use these overloads to identify records by their alternate keys:
-
-```cs
-// Update with shorthand
-// *********************
-
-var entityToFind = new Entity(entityLogicalName, ak, akv);
-orgSvc.Update(entityToFind);
-
-// Retrieve with execute (simple alternative key)
-// **********************************************
-
-var req = new RetrieveRequest(){
-    Target = new EntityReference(entityLogicalName, ak, akv)
-};
-orgSvc.Execute(req);
-
-// Retrieve with execute (compound alternative key)
-// ************************************************
-
-var req = new RetrieveRequest()
-{
-    Target = new EntityReference(
-        entityLogicalName,
-        new KeyAttributeCollection()
-        {
-            new KeyValuePair<string, object>(ak, akv),
-            new KeyValuePair<string, object>(ak2, ak2v),
-        }
-    ),
-};
-orgSvc.Execute(req);
-```
+We can use these overloads to identify records by their alternate keys.
 
 Note: A guid will always be present. However, keys may be deleted. This is a
 disadvantage of alternate keys.
 
-## Demonstrate Use of Different Event Execution Pipeline Stages
+[Alternate keys demo](./resources/DemoPlugins/AlternateKeys.cs)
 
-### What we Need to Know
+### Error Handling
 
-- pre-validation
-- pre-operation
-- post-operation
+We should throw InvalidPluginExecutionExceptions from Plugins. In the resources
+other exceptions are thrown from the concrete demo classes but these are nested
+in an InvalidPluginExecutionException by the abstract base class.
 
-## Implement Business Logic
+Error messages will be displayed to users in Power Apps clients.
 
-### What we Need to Know
+Avoid writing HTML in the message as the raw html will be displayed to users.
 
-- Use for complex logic
-  - custom workflow activities which may be reused in workflows
-  - custom actions can create reusable messages that may be called from other
-    workflows or web service endpoints
-  - Service Bus integration and webhooks can be used to push data to external
-  systems
-- Consider alternatives
-  - calculated fields
-  - rollup fields
-  - power automate
+### Work with Concurrency
 
-## Operations using Organisation Service
+Power Apps is a multi-threaded and multi-user system. There is a need, therefore
+to prevent race conditions. The information below relates only to:
 
-### What we Need to Know
+- UpdateRequests
+- DeleteRequests
 
-- retrieve
-- create
-- update
-- deleting
-- operations on related entities
-- custom actions
-- optimisation with retrieve using column sets
+#### Optimistic Concurrency
 
-## Optimise Plug-In Performance
+Power Apps supports optimistic concurrency for:
 
-### What we Need to Know
+- All custom tables
+- All out-of-the-box tables enabled for offline sync
 
-- Only get data needed
-- Filter columns in steps
-- Use pre and post images
-- Register only where required
-- Minimise speed (note 2-minute limit)
-- Check transaction depth to avoid infinite loops
-- Ensure comprehensive handling and catch IPluginExecutionFault
+This strategy allows processes to proceed without locks on the assumption that
+no conflicts will occur. If a conflict is detected then the operation will be
+rolled back.
 
-## Configure Dataverse Custom API Message
+We can enable optimistic concurrency when using Organisation Service by setting
+the concurrency behaviour of a request to IfRowVersionMatches.
 
-### What we Need to Know
+```cs
+var request = new UpdateRequest(){
+    Target = updatedEntity,
+    ConcurrencyBehavior = ConcurrencyBehavior.IfRowVersionMatches,
+};
+```
 
-- Allows us to build new messages in the pipeline
-- Define the API, request parameters and response parameters
-- They may be global or bound to a table
-- May be called from code or power automate
+#### Always Overwrite
 
-- create with
-  - Maker portal
-  - PRT
-  - Code
+The alternative to optimistic concurrency, is alwaysOverwrite. This will
+overwrite the record regardless of the version number.
+
+#### Default
+
+The default behaviour will be always overwrite except:
+
+- Where optimistic concurrency is enabled on the table, AND
+- The source is WebService as opposed to a plug-in/custom workflow activity
+
+#### Which Should You Use?
+
+Assuming both behaviours are available, optimistic concurrency adds some
+overhead but prioritises data integrity.
+
+Always overwrite is faster but will be at the cost of data integrity where we do
+not want the latest update to always take precedence.
 
 ## Register Plugins Using the PRT
 
-### What we Need to Know
+The recommended method for deploying plugins is to use the Plugin Registration
+Tool. This can be found in Nuget.
 
-- Understand how to register an assembly
-- Register steps
-- Filter attributes
-- Stages and whether sync or async
+Alternatively, if you have the Power Apps CLI installed run:
 
-## Develop a Plugin that Implements a Custom API
+```console
+pac tool prt
+```
 
-### What we Need to Know
+### Strong Name Key
 
-- Add plug-in to perform logic when custom API called
-- Register the assembly
-- Rather than register a step, link plugin assembly to the custom API
+We can use a strong name key to sign the assembly. In visual studio this can be
+done from the properties of the project.
 
-## Configure Dataverse Business Events
+We can also create a key by running:
 
-### What we Need to Know
+```console
+sn -k PACKAGE_NAME.snk
+```
 
-Historically plug-ins used for create and update of records. But we may have
-multiple events at once, e.g. an invoice with various line items.
+We then need to update the csproj file:
 
-We can use business events, e.g. post invoice. There is a catalogue of events
-from which we can choose.
+```xml
+<PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>VerySimplePlugin.snk</AssemblyOriginatorKeyFile>
+</PropertyGroup>
+```
 
-We can then handle a single transaction with a single event which simplifies the
-logic.
+### Register an Assembly
 
-We need to look into this.
+Once connected to the environment in PRT, we can register an assembly.
+Registering is simple, provide the dll and select the plugin classes to
+register.
+
+### Register Steps
+
+Once the assembly has been registered we need to define when the plugin will be
+executed. This is achieved by registering one or more steps for the plugin.
+
+The main fields to note are:
+
+- Message
+- Primary Entity
+- Filtering Attributes
+
+Note that the filtering attributes defaults to all attributes. This should
+generally be edited to relevant attributes to avoid unnecessary runs.
+
+#### Event Pipeline Stages
+
+There are three pipeline stages:
+
+- PreValidation: Before the transaction and any security checks (SYNC)
+- PreOperation: Within the transaction but prior to write (SYNC)
+- PostOperation: After the transaction (SYNC | ASYNC)
+
+We should use the pre-validation stage for any validation logic and if we want
+to conditionally cancel the transaction. We can cancel an operation by throwing
+an InvalidPluginExecutionException within the plugin.
+
+Pre-operation should be used if we want to change and of the table values before
+it is saved.
+
+Post-operation can be used to modify and message properties before the response
+is returned. Be careful about entering an infinite loop.
+
+NOTE: We can rollback in the pre operation stage but this does take time. If we
+are looking to cancel a transaction use pre-validation.
+
+NOTE: We cannot roll back in the post-operation stage. We should also be
+cautious when updating values as this will trigger an update message.
+
+## Tracing Service
+
+Use the tracing service to get visibility into plugin runs. The tracing service
+can be accessed from the service provider:
+
+```cs
+serviceProvider.getService(typeof(ITracingService)) as ITracingService
+```
+
+The Trace method may be used to add a message to the tracing service. Any
+exceptions thrown will also be recorded in the tracing service.
+
+Note:
+
+- By default, a bulk execution job deletes trace logs every 24 hours
+- Logging is asynchronous
+- Trace logs for plugins need to be enabled in the advanced settings
+
+The shorthand methods demo uses the tracing service extensively:
+
+[Shorthand Methods Demo](./resources/DemoPlugins/OrgSvcShorthandMethods.cs)
+
+## Debugging Plugins
+
+We can use the profiler to debug plugins. This is very straight forward.
+
+- Install and start the profiler on a step with the PRT tool
+- Trigger the step manually to capture a profile
+- Select debug in the PRT and select the relevant profile and assembly
+- In VS attach debugger to the PRT process and add breakpoints
+- Select start execution in the PRT

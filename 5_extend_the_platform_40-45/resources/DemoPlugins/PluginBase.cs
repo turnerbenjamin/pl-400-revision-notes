@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceModel;
 using Microsoft.Xrm.Sdk;
 
 namespace DemoPlugins

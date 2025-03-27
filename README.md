@@ -2,7 +2,8 @@
 
 ## Overview
 
-Revision notes and code resources for the MS PL-400 exam.
+Revision notes and code resources for the MS PL-400 exam. These
+are a work in progress and have lots of gaps and inaccuracies.
 
 ## Resource Notes
 
