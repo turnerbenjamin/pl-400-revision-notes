@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoPlugins", "5_extend_the
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomApi", "5_extend_the_platform_40-45\resources\CustomApi\CustomApi.csproj", "{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomConnectors", "CustomConnectors", "{5DCA3602-1FC2-4C31-86B3-31F893BF6DE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwapiConnector", "5_extend_the_platform_40-45\resources\CustomConnectors\SwapiConnector\SwapiConnector.csproj", "{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +28,10 @@ Global
 		{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +40,8 @@ Global
 		{65E279B4-D867-9383-1687-27B9CEB9ECB6} = {10F0A784-642C-FA31-8665-2D9185288946}
 		{E7A92F05-ADC3-1DFD-11CF-0C11C7A2132B} = {65E279B4-D867-9383-1687-27B9CEB9ECB6}
 		{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4} = {65E279B4-D867-9383-1687-27B9CEB9ECB6}
+		{5DCA3602-1FC2-4C31-86B3-31F893BF6DE1} = {65E279B4-D867-9383-1687-27B9CEB9ECB6}
+		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E} = {5DCA3602-1FC2-4C31-86B3-31F893BF6DE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0913F609-4348-4039-B542-9B106676A1CB}
