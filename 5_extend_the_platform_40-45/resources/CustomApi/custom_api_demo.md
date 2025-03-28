@@ -4,7 +4,7 @@
 
 The custom api was registered using PRT.
 
-![registration](../../../0_images/custom_api_prt_registration.png)
+![registration](./screens/create_custom_api_in_prt.png)
 
 This API is bound to the contact entity, this means that there is an implicit
 Target request parameter of type EntityReference. In addition, a second input
@@ -26,12 +26,12 @@ NOTE, adding a plug-in property is not required.
 Since we are permitting sync and async custom processing, additional plugins may
 be registered against the message.
 
-![Step registration](../../../0_images/register_step_for_custom_api.png)
+![Step registration](./screens/subscribe_to_custom_message_with_plugin.png)
 
 Similarly, we can also create a Power Automate flow which runs when a custom
 API message is triggered
 
-![Action registration](../../../0_images/custom_api_pa_action_registration_flow.png)
+![Action registration](./screens/subscribe_to_custom_message_with_flow.png)
 
 ## Triggering the Custom API
 
@@ -46,12 +46,12 @@ This is registered on the update step for contact and filtered by the
 address1_country attribute. This plugin simply calls the Custom API and uses the
 trace log to record the response.
 
-![Trigger plugin trace log](../../../0_images/custom_api_trigger_run.png)
+![Trigger plugin trace log](./screens/invokation_with_plugin.png)
 
 ### Trigger with Power Automate
 
 We can also use Power Automate to trigger the custom API:
 
-![Trigger flow](../../../0_images/custom_api_pa_trigger_flow.png)
+![Trigger flow](./screens/invocation_with_flow.png)
 
-![Trigger result](../../../0_images/custom_api_pa_trigger.png)
+![Trigger result](./screens/notification_screenshot.png)

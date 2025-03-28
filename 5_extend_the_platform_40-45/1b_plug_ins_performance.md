@@ -51,6 +51,8 @@ protection limits.
 
 #### Retry Operations
 
+!! TO BE ADDED
+
 ## Transactions and Locks
 
 The protect the integrity of the database, operations are preformed within a

@@ -32,7 +32,7 @@ this.cr950.formContextDataDemoFunctions = (function () {
    *
    *  It will set the first and last name fields if the form is not valid
    *
-   *  An post save handler is added to demonstrate adding handlers
+   *  A post save handler is added to demonstrate adding handlers
    *  programmatically and the form is saved
    */
   function contactFormOnLoadHandler(executionContext) {

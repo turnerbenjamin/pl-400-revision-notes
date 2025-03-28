@@ -94,7 +94,7 @@ this.cr950.formContextUiDemoFunctions = (function () {
   /**
    * This demo listens for changes on the fax attribute. It gets ui metadata
    * from the form context and displays these in a Confirm Dialogue box. If the
-   * box is selected
+   * box is selected it will navigate to the details tab
    */
   async function accountFaxOnChangeHandler(executionContext) {
     const formContext = executionContext.getFormContext();

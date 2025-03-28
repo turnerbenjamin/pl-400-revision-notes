@@ -105,9 +105,17 @@ this.cr950.xrmNavigationAndPanelDemo = (function () {
       maximumAllowedFileSize: 1024 * 1024 * 1024 * 5, //5GB
     };
     const files = await Xrm.Device.pickFile(pickFileOptions);
+
     if (files.length) {
       const fileToOpen = files[0];
-      Xrm.Navigation.openFile(fileToOpen, { openMode: targets.dialog });
+      Xrm.Navigation.openFile(fileToOpen, {
+        openMode: targets.dialog,
+      });
+      Xrm.Navigation.openAlertDialog({
+        title: "File opened",
+        text: `Filesize: ${fileToOpen.fileSize}kb`,
+        confirmButtonLabel: "Excellent",
+      });
     }
   }
 
@@ -138,6 +146,8 @@ this.cr950.xrmNavigationAndPanelDemo = (function () {
    */
   async function loadPanelDemo() {
     /*
+    DEPRECATED:
+
     const panelTitle = "GOOGLE";
     const url =
       "https://learn.microsoft.com/en-us/power-apps/developer/" +
