@@ -49,7 +49,9 @@ public class Script : ScriptBase
         public List<T>? Results { get; set; }
     }
 
-    // Map requests to the appropriate handlers.
+    // For each custom connector, we can only define one code block. This code
+    // block relates to multiple connectors so this initial method simply routes
+    // requests
     public override async Task<HttpResponseMessage> ExecuteAsync()
     {
         var uri = GetUri(Context.Request.RequestUri);
@@ -62,15 +64,14 @@ public class Script : ScriptBase
         };
     }
 
-    // Generates a new uri with the name parameter of the actions mapped to
-    // the search parameter used by SWAPI.
+    // This method maps the name parameter used in the custom connector to the
+    // search parameter used by SWAPI
     private static Uri? GetUri(Uri? originalUri)
     {
         if (originalUri is null)
         {
             return null;
         }
-
         var uri = new UriBuilder(originalUri);
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
 
@@ -80,6 +81,7 @@ public class Script : ScriptBase
         return uri.Uri;
     }
 
+    // Controller handling get all people from the SWAPI database
     private async Task<HttpResponseMessage> GetAllPeople(Uri? uri)
     {
         var people = await GetAll<Person>(uri);
@@ -90,6 +92,8 @@ public class Script : ScriptBase
         return GetSuccessResponse(people);
     }
 
+    // Controller handling getting a single person by name from the SWAPI
+    // database
     private async Task<HttpResponseMessage> GetPersonByName(Uri? uri)
     {
         var person = await GetOne<Person>(uri, ResponseType.Multiple);
@@ -101,6 +105,8 @@ public class Script : ScriptBase
         return GetSuccessResponse(person);
     }
 
+    // Controller handling getting a single planet by name from the SWAPI
+    // database
     private async Task<HttpResponseMessage> GetPlanetByName(Uri? uri)
     {
         var planet = await GetOne<Planet>(uri, ResponseType.Multiple);
@@ -111,9 +117,8 @@ public class Script : ScriptBase
         return GetSuccessResponse(planet);
     }
 
-    // SWAPI responses return paginated results. If there are more results, the
-    // next property will contain a url to the next page. This method keeps
-    // making request until next is null and returns a complete list of results
+    // The SWAPI list responses are paginated. This method iterates through all
+    // pages and returns the complete results in a single response
     private async Task<List<T>> GetAll<T>(Uri? initialRequest)
         where T : class
     {
@@ -135,8 +140,8 @@ public class Script : ScriptBase
         return parsedResults;
     }
 
-    // If next is not null on the result, constructs a new uri else returns
-    // null
+    // Helper method, creates a uri from the next property on the SWAPI
+    // response. Next contains a url or null.
     private Uri? GetNextUri<T>(SwapiResponse<T> res)
     {
         if (string.IsNullOrEmpty(res.Next) || Context?.Request?.RequestUri is null)
@@ -147,7 +152,8 @@ public class Script : ScriptBase
         return new Uri(baseUri, res.Next);
     }
 
-    // This method returns the first result of the request or null
+    // Return a single response from a give request. Can be used with either
+    // list or single response types.
     private async Task<T?> GetOne<T>(Uri? request, ResponseType responseType)
         where T : class
     {
@@ -179,8 +185,8 @@ public class Script : ScriptBase
         return JsonConvert.DeserializeObject<T>(json);
     }
 
-    // Gets the planet and populates the planet property of person with the
-    // planet's name
+    // Used to populate the home world field of a person with the name of the
+    // planet
     private async Task<string> GetPlanetName(Person person)
     {
         if (!Uri.TryCreate(person?.HomeWorld, UriKind.Absolute, out var homeWorldUri))
@@ -196,14 +202,14 @@ public class Script : ScriptBase
         return planet.Name;
     }
 
-    // Returns a success response containing the serialised list of people.
+    // Returns a success response with a json payload.
     private static HttpResponseMessage GetSuccessResponse(object payload)
     {
-        var serializedPeople = JsonConvert.SerializeObject(payload);
+        var serializedPayload = JsonConvert.SerializeObject(payload);
         return new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(
-                serializedPeople,
+                serializedPayload,
                 System.Text.Encoding.UTF8,
                 "application/json"
             ),
