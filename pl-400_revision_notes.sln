@@ -2,17 +2,19 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5_extend_the_platform_40-45", "5_extend_the_platform_40-45", "{10F0A784-642C-FA31-8665-2D9185288946}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_extend_the_platform_40-45", "2_extend_the_platform_40-45", "{10F0A784-642C-FA31-8665-2D9185288946}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{65E279B4-D867-9383-1687-27B9CEB9ECB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoPlugins", "5_extend_the_platform_40-45\resources\DemoPlugins\DemoPlugins.csproj", "{E7A92F05-ADC3-1DFD-11CF-0C11C7A2132B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoPlugins", "2_extend_the_platform_40-45\resources\DemoPlugins\DemoPlugins.csproj", "{E7A92F05-ADC3-1DFD-11CF-0C11C7A2132B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomApi", "5_extend_the_platform_40-45\resources\CustomApi\CustomApi.csproj", "{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomApi", "2_extend_the_platform_40-45\resources\CustomApi\CustomApi.csproj", "{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomConnectors", "CustomConnectors", "{5DCA3602-1FC2-4C31-86B3-31F893BF6DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwapiConnector", "5_extend_the_platform_40-45\resources\CustomConnectors\SwapiConnector\SwapiConnector.csproj", "{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwapiConnector", "2_extend_the_platform_40-45\resources\CustomConnectors\SwapiConnector\SwapiConnector.csproj", "{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadeScoresAPI", "2_extend_the_platform_40-45\resources\CustomConnectors\ArcadeScoresAPI\ArcadeScoresAPI.csproj", "{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,6 +48,7 @@ Global
 		{0B3990D8-32E4-49EE-BAE0-69FCB5B78AE4} = {65E279B4-D867-9383-1687-27B9CEB9ECB6}
 		{5DCA3602-1FC2-4C31-86B3-31F893BF6DE1} = {65E279B4-D867-9383-1687-27B9CEB9ECB6}
 		{A9A63623-7047-403E-AEDA-C11E2CDB0A6E} = {5DCA3602-1FC2-4C31-86B3-31F893BF6DE1}
+		{E3ABD0AA-9179-48DF-94F1-A6ECF7A764D4} = {5DCA3602-1FC2-4C31-86B3-31F893BF6DE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0913F609-4348-4039-B542-9B106676A1CB}
