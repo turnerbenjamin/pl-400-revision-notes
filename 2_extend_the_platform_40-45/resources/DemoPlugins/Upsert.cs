@@ -7,11 +7,17 @@ namespace DemoPlugins
 {
     public class Upsert : PluginBase
     {
+        private readonly string _accountTrackerName = "Account Tracker";
+
         // Simple demonstration of upsert and execute. Intended to run on
         // account creation
         public override void ExecuteBusinessLogic(IServiceProvider serviceProvider)
         {
             var newAccount = GetTargetEntity().ToEntity<Account>();
+            if (newAccount.Name == _accountTrackerName)
+            {
+                return;
+            }
             UpsertDemo(newAccount);
         }
 
@@ -25,7 +31,7 @@ namespace DemoPlugins
             var accountTracker = new Entity(
                 Account.EntityLogicalName,
                 Account.Fields.Name,
-                "Account Tracker"
+                _accountTrackerName
             );
             accountTracker[Account.Fields.Address1_City] = createdAccount.Name;
 

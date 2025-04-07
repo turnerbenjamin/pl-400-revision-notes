@@ -14,6 +14,26 @@ namespace ArcadeScoresAPI.Functions;
 
 public class ScoresFunction
 {
+    /// <summary>
+    /// Retrieves a list of game scores for a specific game from the database.
+    /// </summary>
+    /// <param name="req">
+    /// The HTTP request data, triggered by an HTTP GET request. The route
+    /// parameter `{game}` specifies the game for which scores are retrieved.
+    /// </param>
+    /// <param name="gameScores">
+    /// A collection of game scores retrieved from the database using the SQL
+    /// input binding.
+    /// </param>
+    /// <param name="context">
+    /// The function execution context, used for logging and other runtime
+    /// operations.
+    /// </param>
+    /// <returns>
+    /// An HTTP response containing the list of game scores in JSON format with
+    /// a status code of 200 (OK). If an error occurs, returns a 500 (Internal
+    /// Server Error) response with an error message.
+    /// </returns>
     [Function(nameof(GetGameScores))]
     public static async Task<HttpResponseData> GetGameScores(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "scores/{game}")]
@@ -47,6 +67,25 @@ public class ScoresFunction
         }
     }
 
+    /// <summary>
+    /// Creates a new game score and stores it in the database.
+    /// </summary>
+    /// <param name="req">
+    /// The HTTP request data, triggered by an HTTP POST request. The request
+    /// body must contain a valid JSON representation of a GameScore object.
+    /// </param>
+    /// <param name="context">
+    /// The function execution context, used for logging and other runtime
+    /// operations.
+    /// </param>
+    /// <returns>
+    /// An HTTP response indicating the result of the operation:
+    /// - 201 (Created) if the game score is successfully created.
+    /// - 400 (Bad Request) if the request body is invalid or missing required
+    ///       properties.
+    /// - 409 (Conflict) if the gamer tag exceeds the allowed length.
+    /// - 500 (Internal Server Error) if an unexpected error occurs.
+    /// </returns>
     [Function(nameof(PostGameScore))]
     public static async Task<HttpResponseData> PostGameScore(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "scores")] HttpRequestData req,
@@ -75,7 +114,7 @@ public class ScoresFunction
                 "Request body is invalid. Game Type object required with a label property"
             );
         }
-        catch (SqlException ex) when (ex.Number == 8152) // Handle tag too long
+        catch (SqlException ex) when (ex.Number == 8152)
         {
             return await Utilities.BuildResponse(
                 req,
@@ -94,6 +133,20 @@ public class ScoresFunction
         }
     }
 
+    /// <summary>
+    /// Parses the HTTP request body to extract a GameScore object.
+    /// </summary>
+    /// <param name="req">
+    /// The HTTP request data containing the JSON representation of a GameScore
+    /// object.
+    /// </param>
+    /// <returns>
+    /// A GameScore object parsed from the request body if valid.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the request body is null, empty, or does not contain a valid
+    /// GameScore object.
+    /// </exception>
     private static async Task<GameScore> ParseGameScore(HttpRequestData req)
     {
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();

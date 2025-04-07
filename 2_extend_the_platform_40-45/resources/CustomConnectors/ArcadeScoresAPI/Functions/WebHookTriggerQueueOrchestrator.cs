@@ -3,12 +3,32 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 using Microsoft.DurableTask;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace ArcadeScoresAPI.Functions
 {
     public static class WebHookTriggerQueueOrchestrator
     {
+        /// <summary>
+        /// Executes the Durable Task orchestration to trigger webhooks for
+        /// active subscriptions.
+        /// </summary>
+        /// <param name="context">
+        /// The orchestration context, used to manage the orchestration flow and
+        /// call activity functions.
+        /// </param>
+        /// <param name="webHookSubs">
+        /// A collection of webhook subscriptions retrieved from the database
+        /// using the SQL input binding.
+        /// </param>
+        /// <param name="executionContext">
+        /// The function execution context, used for logging and other runtime
+        /// operations.
+        /// </param>
+        /// <returns>
+        /// A task representing the asynchronous operation. Triggers webhooks
+        /// for all active subscriptions
+        /// by calling the `TriggerWebhook` activity function.
+        /// </returns>
         [Function(nameof(RunOrchestrator))]
         public static async Task RunOrchestrator(
             [OrchestrationTrigger] TaskOrchestrationContext context,
@@ -21,7 +41,6 @@ namespace ArcadeScoresAPI.Functions
         )
         {
             var logger = executionContext.GetLogger(nameof(RunOrchestrator));
-            logger.LogInformation("IN ORCHESTRATOR");
 
             var tasks = new List<Task>();
             foreach (var webHookSub in webHookSubs)
@@ -44,6 +63,22 @@ namespace ArcadeScoresAPI.Functions
             await Task.WhenAll(tasks);
         }
 
+        /// <summary>
+        /// Sends a POST request to a webhook URL with the specified message
+        /// payload.
+        /// </summary>
+        /// <param name="input">
+        /// The input containing the webhook URL and the message payload to be
+        /// sent.
+        /// </param>
+        /// <param name="executionContext">
+        /// The function execution context, used for logging and other runtime
+        /// operations.
+        /// </param>
+        /// <returns>
+        /// A task representing the asynchronous operation. Logs the response
+        /// status code or any errors encountered during the operation.
+        /// </returns>
         [Function(nameof(TriggerWebhook))]
         public static async Task TriggerWebhook(
             [ActivityTrigger] WebHookTriggerWorkerInput input,

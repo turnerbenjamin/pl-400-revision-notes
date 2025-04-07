@@ -11,6 +11,25 @@ namespace ArcadeScoresAPI.Functions;
 
 public class WebHoodFunction
 {
+    /// <summary>
+    /// Subscribes to a webhook by accepting a subscription request and storing
+    /// it in the database.
+    /// </summary>
+    /// <param name="req">
+    /// The HTTP request data, triggered by an HTTP POST request. The request
+    /// body must contain a valid JSON representation of a WebHookSubscription
+    /// object.
+    /// </param>
+    /// <param name="context">
+    /// The function execution context, used for logging and other runtime
+    /// operations.
+    /// </param>
+    /// <returns>
+    /// An IActionResult indicating the result of the operation:
+    /// - 200 (OK) if the subscription is successfully created.
+    /// - 400 (Bad Request) if the request body is empty or invalid.
+    /// - 500 (Internal Server Error) if an unexpected error occurs.
+    /// </returns>
     [Function(nameof(SubscribeToWebhook))]
     public static async Task<IActionResult> SubscribeToWebhook(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "webhooks/subscribe")]

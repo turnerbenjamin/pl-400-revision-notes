@@ -2,21 +2,26 @@
 
 ## Intro
 
-A connector is just a proxy/wrapper around a REST or SOAP API. It describes the
-endpoints of the API and the data structures so that Power Apps may communicate
-with that service.
+Connectors allow the Power Platform to communicate with external APIs, for
+instance, an API built with Azure Function Apps. A connector is just a
+proxy/wrapper around a REST or SOAP API. It describes the endpoints of the API
+and the data structures it receives/returns so that Power Platform may
+communicate with that service.
 
-Power Apps includes a large library of prebuilt connectors, however, if these do
-not include the connection that we require we can create custom connectors.
-
-Once created we can use the connector in:
+There is a substantial library of prebuilt connectors, however, if these do not
+include the service or functionality we require then a custom creator may be
+created. Once created we can use the connector in:
 
 - Power Automate
 - Power Apps
 - Logic Apps
 - Copilot Studio
 
-We can create a connector without writing a single line of code.
+We can build a connector without writing a single line of code, however there
+are advanced features of connectors that may require the API to have supporting
+capabilities. We may also need to interact with the OpenAPI definition directly
+writing JSON or YAML, as some advanced features cannot be customised through the
+custom API designer.
 
 ## Creating a Connector
 
@@ -32,10 +37,10 @@ There are various options to quickly configure a custom connector:
 - Import from GitHub
 
 In this section, we will use Create from Blank. If you have multiple actions and
-triggers it will be faster to use one of the other options.
-
-The create from blank option just takes you through a wizard to create an Open
-Api/Swagger file.
+triggers it will be faster to use one of the other options. When we select
+Create from Blank, the custom API designer will be opened. This provides a UI
+to build an OpenAI/Swagger definition from scratch. If we need to interact with
+the definition directly, we can switch to the Swagger editor.
 
 ### Creating a Connector: General Tab
 
@@ -75,10 +80,8 @@ This tab allows us to create:
 Actions are essentially endpoints we can we can call on demand using the
 connector.
 
-##### Actions: General
-
-In the general section, we provide a summary and description for the action. We
-also need to provide a unique operation id and specify the visibility:
+In the general section, we provide a summary,description and operation id for
+the action. We can also specify the visibility:
 
 - None: Displays normally
 - Advanced: Hidden under a show advanced menu
@@ -88,49 +91,38 @@ also need to provide a unique operation id and specify the visibility:
 Under the hood, this option sets the x-ms-visibility header to the appropriate
 value.
 
-##### Actions: Request
-
-The request contains:
-
-- HTTP Verb
-- Endpoint url
-- Headers
-- Query Parameters
-- Body
-
-We can import from a sample.
-
-##### Actions: Response
-
-We can define the response from a sample copying in the headers the JSON
-returned.
+There is then a request and response section, these allow us to import from a
+sample.
 
 ##### Triggers
 
-In addition to actions, we can also create triggers. We can subscribe to these
-triggers, e.g. with a Power Automate and take actions.
+Triggers allow us to trigger a workflow when an event occurs in an external
+service, for example, when a row is added in the Dataverse.
 
 We can use one of two mechanisms for triggers:
 
 - Webhooks: Listen for an event to occur on an endpoint
 - Polling: Call service at a specified frequency to check for new data
 
-The API will need to support polling or webhooks for these to be defined.
+In both instances, the API needs to provide the relevant capability. For
+instance, with webhooks, the API will need to provide an endpoint that will
+receive and store callback urls which may then be used to inform Power Platform
+when a relevant event has occurred.
 
 ##### Policies
 
-Policies can be used to modify behaviour at runtime, for instance based on the
+Policies can be used to modify behaviour at runtime, for example based on the
 language of the user.
 
 We can create polities from the definition tab or using the paconn cli. A given
 connector can have multiple policies, and they may be ordered to control the
 order of execution.
 
-Each policy can apply to one or more operations (actions/triggers)
+Each policy can apply to one or more operations.
 
 ###### Expressions
 
-Policies use expression to specify where data is accessed from. Expressions are
+Policies use expressions to specify where data is accessed from. Expressions are
 prefixed with an @ symbol.
 
 - Wrapping an expression in curly braces will cast a numeric value to a string
@@ -176,14 +168,6 @@ We can select whether the policy should run on the request or the response. Note
 if having transformed the request/response the relevant templates should be
 updated.
 
-## Configure Policy Templates to Modify Connector Behaviour at Runtime
-
-### What we Need to Know
-
-- A connector may group a number of API calls
-  - Policy templates allow us to manage differences between calls
-  - E.g. route to different endpoint, add info to header etc
-
 ### Creating a Connector: AI Plugin Tab
 
 To use a connector as an AI connector it must be certified. This section relates
@@ -200,18 +184,17 @@ The code must be:
 - Have a maximum execution time of five seconds
 - Have a file size no larger than 1mb
 
-The resources contain a ludicrous example of custom code. Although, it is likely
-unrealistic, some key takeaways from the exercise were:
+Note:
 
 - Don't include any usings before checking they will be available at runtime.
 There is a limited set of available namespaces we may use.
-- Only one code block may be defined regardless of the number of actions. It is
-possible to enable multiple actions to use the custom code but you may need to
-add some routing in the class if each action has custom logic.
+- Only one code block may be defined regardless of the number of actions.
+However, the code block may be applied to multiple operations
 
 ### Creating a Connector: Test Tab
 
-The final tab is the test tab.
+The final tab is the test tab. We can use this to run actions and validate that
+the responses are in the correct shape.
 
 ## Extend Open API Definition for a Custom Connector
 
@@ -219,13 +202,13 @@ Custom connectors use OpenAPI (AKA Swagger) definitions to describe auth,
 actions, triggers and parameters.
 
 MS has defined a variety of extensions to the OpenAPI definition, which can be
-identified by the x-ms- prefix. Many of the extensions can be applied through
+identified by the x-ms-prefix. Many of the extensions can be applied through
 the connection designer, for instance x-ms-visibility and x-ms-summary for
 actions. Other extensions can only be specified using the Swagger editor.
 
 ### Configuring Extensions
 
-There are four methods we may use to configure extensions:
+There are three methods we may use to configure extensions:
 
 - Import from an OpenAPI file that contains ms extensions
 - Use either the Power Platform CLI (pac) or Power Platform Connectors CLI
@@ -280,7 +263,7 @@ x-ms-capabilities:
     parameters: {}
 ```
 
-##### x-ms-url-encoding
+#### x-ms-url-encoding
 
 This extension relates to url parameters, e.g. planets/{id}. Since id will be a
 parameter supplied by the user of the connector, they will need to be
@@ -297,7 +280,7 @@ x-ms-url-encoding: double
 This means that users can use the connector without having to encode path
 parameters manually.
 
-##### x-ms-dynamic-values & x-ms-dynamic-list
+#### x-ms-dynamic-values & x-ms-dynamic-list
 
 By default, action parameters are added as a simple text box. MS Learn provide a
 good example here of an Invoice Type ID parameter with two options:
@@ -317,7 +300,7 @@ enum: [1,2]
 This would then display the two options that may be selected. However, the user
 would still need to know which operations each of these ids map to.
 
-###### x-ms-dynamic-values
+##### x-ms-dynamic-values
 
 This extension may be used to request a list of values from the API. The
 benefits of this approach are that:
@@ -342,7 +325,7 @@ x-ms-dynamic-values: {
 }
 ```
 
-###### x-ms-dynamic-list
+##### x-ms-dynamic-list
 
 This is an updated version of the above extension. For older, existing flows the
 recommendation is to implement both. For newer flows we should just use
@@ -360,7 +343,7 @@ x-ms-dynamic-list: {
 The benefit of this newer extension is that it can resolve ambiguity, e.g. where
 the request has both a path and body parameter with the same name.
 
-##### Dynamic Schema
+#### Dynamic Schema
 
 By default the parameters for a given operation are static. However, we may want
 these to be variable, e.g.:
@@ -428,52 +411,38 @@ network.
 Depending on how connectors and connections are shared, credentials will be
 collected at different stages.
 
-### Entra ID
+### Use a Service Principle for Authentication
 
-We can have an Entra ID secured custom connector. The architecture is similar to
-a general custom connector, however, both the connector and app service will be
-have an App Registration with Entra ID.
+A service principle represents the identity of an application rather than a
+user. This allows us to authenticate and perform actions on Azure resources
+without providing user credentials.
 
-The benefit is that makers can apply appropriate permissions and then pass the
-calling user's identity from an app in Power Apps/Power Automate/Logic Apps to
-the underlying service. This helps to protect and authorise access to secured
-resources using the identity of the caller.
+Role-Based Access Control (RBAC), can be used to assign the service principal
+with specific roles in order to control access to Azure resources.
 
-The service may be an existing service registered in Entra ID or a custom
-service, e.g. one implemented with Azure Functions or Microsoft Azure App
-Service.
+To connect to certain services, e.g. Microsoft Graph and Azure CLI with a custom
+connector, we must use a service principal. Azure will copy authentication
+details for the service principle within the connector security definition.
 
-#### Securing a Connector with Entra ID
+#### Authenticating with a Service Principal
 
-We need to create two App registrations to identify and protect the API service
-and the connector.
+At a high level:
 
-We need to allow the registered app for the connector to make "on-behalf" calls
-to the service's identity.
+- Create an application registration and copy the application and tenant id
+- Add a secret for the application and copy the secret value
+- In the connector security tab set-up oAuth with Azure AD and enable service
+principal support. Enter credentials for the principal
+- Save the connector and copy the redirect url from the security tab
+- In the service principal app registration, use the auth section to configure
+a web platform and copy in the redirect url from the custom connector
 
-Next, we need to set up OAuth 2.0 in the connector with Azure Active Directory
-as the provider. This will generate a redirect url which we can then add to the
-connector app's registration.
+## Demos
 
-If the service is set up with CORS, then you need to allow APIM domains,
-generally azure-apim.net for CORS on the service.
+Three demos have been created for custom connectors
 
-While this is a more involved process, it is the recommended method for securing
-connectors.
-
-## Develop an Azure Function to be Used in a Custom Connector
-
-We can create an API service using a HTTP Triggered Azure function and connect
-with a Custom Connector.
-
-TODO: Add a demo connecting to a HTTP Trigger created in the Azure Functions
-section. There is no need to write a separate function for this.
-
-## For Tomorrow
-
-- continue from Policy Templates
-- Set up a simple API with Azure Functions that: x
-- uses custom policy templates and adjusts connection properties x
-- Uses Entra ID for Auth
-- Ideally has a trigger
-- Ideally uses some API Extension methods
+- [SWAPI](./demos/custom_connectors_swapi_demo.md): Uses a pre-existing API and
+custom code to transform the responses
+- [Arcade Game Scores](./demos/custom_connectors_arcade_scores_demo.md): Uses a
+custom API to explore the use of triggers and the dynamic list extension
+- [Graph API](./demos/custom_connectors_service_principal_auth_demo.md): Follows
+MS learn exercise to authenticate with a service principal

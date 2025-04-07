@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DemoPlugins.Model;
 using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 
 namespace DemoPlugins
@@ -76,8 +75,6 @@ namespace DemoPlugins
                 $"Retrieved account - NAME: {a.Name}, "
                     + $"Primary Contact Id: {a.PrimaryContactId?.Id.ToString() ?? "NONE"}"
             );
-
-            var r = new RetrieveRequest();
         }
 
         // Update the name of the sample account. Here an overload of entity is

@@ -1,5 +1,5 @@
 
-# Plug-Ins and Custom Messages
+# Custom APIs and Custom Messages
 
 ## Introduction
 
@@ -51,10 +51,10 @@ There are various ways to create a custom API:
 - Power apps maker portal (Solution -> New -> More -> Other -> Custom API)
 - Code
 
-Note, the custom api and any input/output parameters will be customisable by
+Note, the custom API and any input/output parameters will be customisable by
 default. It is recommended that we change this to false so that it cannot be
-modified when exported as a managed solution. Find the Api and params in the
-solution, select the kebab menu and edit the managed properties.
+modified when exported as a managed solution. Find the Api and parameters in the
+solution, select the ... menu and edit the managed properties.
 
 ## Creating a Custom API with PRT
 
@@ -75,7 +75,8 @@ the message.
 
 We can use this when we want to allow developers to detect when the operation
 occurs but not permit them to cancel or customise the behaviour of the
-operation.
+operation. Since only async steps may be registered, any logic added by other
+developers will always be outside of the transaction.
 
 This is recommended when using the business event pattern where a business event
 creates a trigger in Power Automate you can use when the event occurs
@@ -103,15 +104,11 @@ action.
 
 In OData a function is an operation called with GET that returns data without
 making any changes. Parameters are passed in the url when the function is
-invoked.
-
-Functions must return some data else it will not appear in the metadata service
-document and a 404 error will be returned when the function is invoked.
+invoked. Functions must return some data else it will not appear in the metadata
+service document and a 404 error will be returned when the function is invoked.
 
 We cannot use functions when the API is enabled for workflow. The Dataverse
 Connector currently only enables actions.
-
-Note, there is a limit on the length of a url we can send.
 
 Actions use POST:
 
@@ -122,7 +119,7 @@ Actions use POST:
 ### Making APIs Private
 
 We can make Custom APIs private, this will keep the API out of the metadata
-service document. While this will flag that the API should not be used it does
+service document. While this will flag that the API should not be used, it does
 not prevent other developers using the message if they have awareness of it.
 
 We can add some security by adding an Execute Privilege property.
@@ -132,9 +129,12 @@ We can add some security by adding an Execute Privilege property.
 There's not much to say here, we can define input and output parameters. Just
 remember that:
 
-- A function must have at least on output parameter
+- A function must have at least one output parameter
 - Input parameters for a function are passed as a query string which can be
 limiting
+
+When using a plug-in, we can access both the input and output parameters from
+the execution context.
 
 ## Custom API Business Logic
 
@@ -146,7 +146,8 @@ We can attach business logic to a custom API by:
 
 Generally, a plug-in is attached to the custom API. However note that:
 
-- The profiler cannot be used for debugging as a profiler is connected to a step
+- The profiler cannot be used for debugging as the profiler is attached to a
+step
 - Secure and unsecure configurations cannot be set
 
 In both cases the workaround is to choose the second option, register the plugin
@@ -163,6 +164,4 @@ Again, there are multiple ways to trigger a custom API message.
 var req = new OrganizationRequest(customApiName)
 ```
 
-The resources contain a demonstration of custom apis:
-
-[demo](./resources/CustomApi/custom_api_demo.md)
+A demonstration of Custom APIs can be found [here](./demos/custom_api_demo.md).

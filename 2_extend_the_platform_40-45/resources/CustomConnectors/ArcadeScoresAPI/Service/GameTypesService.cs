@@ -5,6 +5,23 @@ namespace ArcadeScoresAPI.Service;
 
 public class GameTypesService
 {
+    /// <summary>
+    /// Inserts a new game type into the database.
+    /// </summary>
+    /// <param name="gameType">
+    /// The GameType object containing the details of the game type to be
+    /// inserted.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation. Inserts the game type
+    /// into the database.
+    /// </returns>
+    /// <exception cref="SqlException">
+    /// Thrown if there is an issue executing the SQL command.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the database connection cannot be established.
+    /// </exception>
     public static async Task Post(GameType gameType)
     {
         var connectionString = Environment.GetEnvironmentVariable(
