@@ -11,7 +11,7 @@ type appClient struct {
 	resourceUrl string
 }
 
-func GetAppService(c DataverseServiceConfig) (DataverseService, error) {
+func GetAppService(c ClientConfig) (DataverseService, error) {
 
 	cred, err := confidential.NewCredFromSecret(c.ClientSecret)
 	if err != nil {

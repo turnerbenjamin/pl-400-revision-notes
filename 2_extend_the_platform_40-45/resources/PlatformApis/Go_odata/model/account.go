@@ -16,7 +16,6 @@ func (a *Account) ToJSON() []byte {
 	if err != nil {
 		log.Fatal("failed to serialise account")
 	}
-	log.Println(string(body))
 	return body
 }
 

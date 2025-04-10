@@ -7,6 +7,14 @@ import (
 	"net/http"
 )
 
+type ClientConfig struct {
+	ClientId     string
+	ClientSecret string
+	ResourceUrl  string
+	APIBaseUrl   string
+	Authority    string
+}
+
 type dataverseClient interface {
 	AcquireToken() (string, error)
 }
@@ -14,15 +22,9 @@ type dataverseClient interface {
 type DataverseService interface {
 	Post(endpoint string, payload []byte) (*DataverseResponse, error)
 	Get(endpoint string) (*DataverseResponse, error)
-}
-
-type DataverseServiceConfig struct {
-	ClientId     string
-	TenantId     string
-	ClientSecret string
-	APIBaseUrl   string
-	Authority    string
-	ResourceUrl  string
+	GetMany(endpoint string) (*DataverseResponse, error)
+	Connect() error
+	GetNext(url string) (*DataverseResponse, error)
 }
 
 type dataverseService struct {
@@ -36,6 +38,11 @@ type DataverseResponse struct {
 	IsSuccessful bool
 }
 
+func (s dataverseService) Connect() error {
+	_, err := s.client.AcquireToken()
+	return err
+}
+
 func (s dataverseService) Post(endpoint string, payload []byte) (*DataverseResponse, error) {
 	path := s.baseurl + endpoint
 	req, err := http.NewRequest(http.MethodPost, path, bytes.NewReader(payload))
@@ -43,6 +50,7 @@ func (s dataverseService) Post(endpoint string, payload []byte) (*DataverseRespo
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Prefer", "return=representation")
 	return s.makeRequest(req)
 }
 
@@ -52,6 +60,25 @@ func (s dataverseService) Get(endpoint string) (*DataverseResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	return s.makeRequest(req)
+}
+
+func (s dataverseService) GetMany(endpoint string) (*DataverseResponse, error) {
+	path := s.baseurl + endpoint
+	req, err := http.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Prefer", "odata.maxpagesize=5")
+	return s.makeRequest(req)
+}
+
+func (s dataverseService) GetNext(url string) (*DataverseResponse, error) {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Prefer", "odata.maxpagesize=2")
 	return s.makeRequest(req)
 }
 
@@ -67,7 +94,6 @@ func (s dataverseService) makeRequest(req *http.Request) (*DataverseResponse, er
 	req.Header.Set("OData-Version", "4.0")
 	req.Header.Set("OData-MaxVersion", "4.0")
 	req.Header.Set("Authorization", "Bearer "+accessToken)
-	req.Header.Set("Prefer", "return=representation")
 
 	httpClient := &http.Client{}
 	res, err := httpClient.Do(req)
