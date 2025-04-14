@@ -14,7 +14,3 @@ func NewGetManyResponseFromJson[T any](responseJson []byte) *GetManyResponse[T] 
 	json.Unmarshal(responseJson, &res)
 	return &res
 }
-
-func (r *GetManyResponse[T]) HasNext() bool {
-	return r.Next != ""
-}

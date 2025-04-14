@@ -26,7 +26,12 @@ func main() {
 		ResourceUrl:  eu,
 		APIBaseUrl:   eu + "api/data/v9.2/",
 		Authority:    fmt.Sprintf("https://login.microsoftonline.com/%s", tid),
+		PageLimit:    5,
 	}
-	a := app.Create(c)
+	a, err := app.Create(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	a.Run()
 }

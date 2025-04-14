@@ -1,44 +1,51 @@
 package service
 
-import (
-	"github.com/turnerbenjamin/go_odata/model"
-	"github.com/turnerbenjamin/go_odata/msal"
-)
+// import (
+// 	"github.com/turnerbenjamin/go_odata/model"
+// 	"github.com/turnerbenjamin/go_odata/msal"
+// )
 
-type EntityList[T any] interface {
-	GetData() []T
-	HasNext() bool
-	GetNext() (EntityList[T], error)
-}
+// type EntityList[T any] interface {
+// 	GetData() []T
+// 	HasNext() bool
+// 	GetNext() (EntityList[T], error)
+// 	HasPrevious() bool
+// 	GetPrevious() EntityList[T]
+// }
 
-type entityList[T any] struct {
-	res *model.GetManyResponse[T]
-	svc msal.DataverseService
-}
+// type entityList[T any] struct {
+// 	svc      msal.DataverseService
+// 	data     []T
+// 	next     string
+// 	previous EntityList[T]
+// }
 
-func (el *entityList[T]) GetData() []T {
-	return el.res.Data
-}
+// func (el *entityList[T]) GetData() []T {
+// 	return el.data
+// }
 
-func (el *entityList[T]) HasNext() bool {
-	return el.res.HasNext()
-}
+// func (el *entityList[T]) HasNext() bool {
+// 	return el.next != ""
+// }
 
-func (el *entityList[T]) GetNext() (EntityList[T], error) {
-	r, err := el.svc.GetNext(el.res.Next)
-	if err != nil {
-		return nil, err
-	}
-	gmr := model.NewGetManyResponseFromJson[T](*r.Body)
-	return &entityList[T]{
-		res: gmr,
-		svc: el.svc,
-	}, nil
+// func (el *entityList[T]) GetNext() (EntityList[T], error) {
+// 	r, err := el.svc.GetNext(el.next)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	gmr := model.NewGetManyResponseFromJson[T](*r.Body)
+// 	return &entityList[T]{
+// 		svc:      el.svc,
+// 		data:     gmr.Data,
+// 		next:     gmr.Next,
+// 		previous: el,
+// 	}, nil
+// }
 
-}
+// func (el *entityList[T]) HasPrevious() bool {
+// 	return el.previous != nil
+// }
 
-// type Service[T any] interface {
-// 	Create(*T) (*T, error)
-// 	List(string, int)
-// 	RetrieveByName(name string)
+// func (el *entityList[T]) GetPrevious() EntityList[T] {
+// 	return el.previous
 // }

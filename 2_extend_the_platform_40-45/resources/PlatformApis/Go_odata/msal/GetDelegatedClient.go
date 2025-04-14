@@ -12,19 +12,19 @@ type delegatedClient struct {
 	resourceUrl string
 }
 
-func GetDelegatedService(c ClientConfig) (DataverseService, error) {
+func GetDelegatedService(c ClientOptions) (DataverseClient, error) {
 	client, err := public.New(c.ClientId, public.WithAuthority(c.Authority))
-	return &dataverseService{
-		client: &delegatedClient{
-			client:      &client,
-			resourceUrl: c.ResourceUrl,
-		},
-		baseurl: c.APIBaseUrl,
-	}, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &delegatedClient{
+		client:      &client,
+		resourceUrl: c.ResourceUrl,
+	}, nil
 }
 
 func (c *delegatedClient) AcquireToken() (string, error) {
-
 	scopes := []string{c.resourceUrl + "user_impersonation"}
 
 	// Looks for a token in the cache

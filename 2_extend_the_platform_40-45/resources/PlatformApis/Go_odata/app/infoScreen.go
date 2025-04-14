@@ -5,9 +5,9 @@ import (
 	"github.com/turnerbenjamin/go_odata/view/colours"
 )
 
-func newSuccessScreen(msg string) (view.Screen, error) {
+func newInfoScreen(msg string) (view.Screen, error) {
 	return view.MakeScreen([]view.Component{
-		view.NewTitleComponent("SUCCESS", colours.Green),
+		view.NewTitleComponent("INFO", colours.Blue),
 		view.NewTextComponent(msg),
 		view.NewAnyKeyToContinueComponent(),
 	})

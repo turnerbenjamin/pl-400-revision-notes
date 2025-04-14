@@ -1,21 +1,26 @@
 package app
 
 import (
+	"github.com/turnerbenjamin/go_odata/constants/authMode"
 	"github.com/turnerbenjamin/go_odata/view"
 	"github.com/turnerbenjamin/go_odata/view/colours"
 )
 
-type authenticationMode string
+func GetConfigScreen() (view.Screen, error) {
 
-const (
-	CONFIG_APPLICATION_MODE authenticationMode = "Application"
-	CONFIG_USER_MODE        authenticationMode = "User"
-)
+	menu, err := view.NewMenuComponent([]string{
+		string(authMode.Application),
+		string(authMode.User),
+	},
+	)
 
-func GetConfigScreen() view.Screen {
+	if err != nil {
+		return nil, err
+	}
+
 	return view.MakeScreen([]view.Component{
-		view.BuildTitleComponent("CONFIGURATION", colours.PURPLE),
-		view.BuildTextComponent("Select authentication mode"),
-		view.BuildMenuComponent([]string{string(CONFIG_APPLICATION_MODE), string(CONFIG_USER_MODE)}),
+		view.NewTitleComponent("CONFIGURATION", colours.Purple),
+		view.NewTextComponent("Select authentication mode"),
+		menu,
 	})
 }

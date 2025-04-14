@@ -7,12 +7,12 @@ import (
 	"github.com/turnerbenjamin/go_odata/view/colours"
 )
 
-func getErrorScreen(msg string) view.Screen {
+func getErrorScreen(msg string) (view.Screen, error) {
 	fm := strings.ReplaceAll(msg, ". ", ".\n")
 
 	return view.MakeScreen([]view.Component{
-		view.BuildTitleComponent("ERROR", colours.RED),
-		view.BuildTextComponent(fm),
-		view.BuildAnyKeyToContinueComponent(),
+		view.NewTitleComponent("ERROR", colours.Red),
+		view.NewTextComponent(fm),
+		view.NewAnyKeyToContinueComponent(),
 	})
 }

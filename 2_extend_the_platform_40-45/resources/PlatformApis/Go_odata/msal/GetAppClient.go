@@ -11,21 +11,21 @@ type appClient struct {
 	resourceUrl string
 }
 
-func GetAppService(c ClientConfig) (DataverseService, error) {
-
+func GetAppService(c ClientOptions) (DataverseClient, error) {
 	cred, err := confidential.NewCredFromSecret(c.ClientSecret)
 	if err != nil {
 		return nil, err
 	}
 
 	app, err := confidential.New(c.Authority, c.ClientId, cred)
-	return &dataverseService{
-		client: &appClient{
-			client:      &app,
-			resourceUrl: c.ResourceUrl,
-		},
-		baseurl: c.APIBaseUrl,
-	}, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &appClient{
+		client:      &app,
+		resourceUrl: c.ResourceUrl,
+	}, nil
 }
 
 func (c *appClient) AcquireToken() (string, error) {

@@ -12,28 +12,28 @@ import (
 	"github.com/turnerbenjamin/go_odata/view"
 )
 
-var accountSelects = "$select=accountid,name,address1_city"
+var contactSelects = "$select=contactid,firstname,lastname,emailaddress1"
 
-type accountsService struct {
+type contactService struct {
 	dataverseService    DataverseService
-	getNextResponseFunc func(string) (*model.GetManyResponse[*model.Account], error)
+	getNextResponseFunc func(string) (*model.GetManyResponse[*model.Contact], error)
 	baseUrl             string
 	pageLimit           int
 }
 
-func NewAccountService(dataverseService DataverseService, baseUrl string, pageLimit int) EntityService[*model.Account] {
-	return &accountsService{
+func NewContactService(dataverseService DataverseService, baseUrl string, pageLimit int) EntityService[*model.Contact] {
+	return &contactService{
 		dataverseService:    dataverseService,
-		getNextResponseFunc: buildGetNextResultFunction[*model.Account](dataverseService, pageLimit),
+		getNextResponseFunc: buildGetNextResultFunction[*model.Contact](dataverseService, pageLimit),
 		baseUrl:             baseUrl,
 		pageLimit:           pageLimit,
 	}
 }
 
-func (s *accountsService) Create(account *model.Account) (*model.Account, error) {
+func (s *contactService) Create(contact *model.Contact) (*model.Contact, error) {
 
-	path := s.baseUrl + "accounts"
-	req, err := reqbuilder.NewODataReqBuilder(http.MethodPost, path, bytes.NewReader(account.ToJSON())).
+	path := s.baseUrl + "contacts"
+	req, err := reqbuilder.NewODataReqBuilder(http.MethodPost, path, bytes.NewReader(contact.ToJSON())).
 		Build()
 	if err != nil {
 		return nil, err
@@ -52,17 +52,17 @@ func (s *accountsService) Create(account *model.Account) (*model.Account, error)
 		return nil, errors.New(errMsg)
 	}
 
-	newAccount := model.NewAccountFromJson(*res.Body)
+	newAccount := model.NewContactFromJson(*res.Body)
 	return newAccount, nil
 }
 
-func (s *accountsService) List(searchTerm string) (view.EntityList[*model.Account], error) {
+func (s *contactService) List(searchTerm string) (view.EntityList[*model.Contact], error) {
 
-	path := s.baseUrl + "accounts"
+	path := s.baseUrl + "contacts"
 	rb := reqbuilder.NewODataReqBuilder(http.MethodGet, path, nil).
-		AddQueryParam(accountSelects)
+		AddQueryParam(contactSelects)
 	if searchTerm != "" {
-		filter := url.QueryEscape(fmt.Sprintf("contains(name,'%s') or contains(address1_city,'%s')", searchTerm, searchTerm))
+		filter := url.QueryEscape(fmt.Sprintf("contains(fullname,'%s') or contains(emailaddress1,'%s')", searchTerm, searchTerm))
 		rb.AddQueryParam("$filter=" + filter)
 	}
 
@@ -83,17 +83,17 @@ func (s *accountsService) List(searchTerm string) (view.EntityList[*model.Accoun
 		return nil, errors.New(string(errMsg))
 	}
 
-	gmr := model.NewGetManyResponseFromJson[*model.Account](*res.Body)
+	gmr := model.NewGetManyResponseFromJson[*model.Contact](*res.Body)
 
 	return model.CreateEntityList(*gmr, s.getNextResponseFunc), nil
 }
 
-func (s *accountsService) Get(guid string) (*model.Account, error) {
+func (s *contactService) Get(guid string) (*model.Contact, error) {
 
-	path := fmt.Sprintf("%saccounts(%s)", s.baseUrl, guid)
+	path := fmt.Sprintf("%scontacts(%s)", s.baseUrl, guid)
 
 	req, err := reqbuilder.NewODataReqBuilder(http.MethodGet, path, nil).
-		AddQueryParam(accountSelects).
+		AddQueryParam(contactSelects).
 		Build()
 	if err != nil {
 		return nil, err
@@ -109,12 +109,12 @@ func (s *accountsService) Get(guid string) (*model.Account, error) {
 		return nil, errors.New(errMsg)
 	}
 
-	account := model.NewAccountFromJson(*res.Body)
+	account := model.NewContactFromJson(*res.Body)
 	return account, nil
 }
 
-func (s *accountsService) Update(guid string, entityToUpdate *model.Account) error {
-	path := fmt.Sprintf("%saccounts(%s)", s.baseUrl, guid)
+func (s *contactService) Update(guid string, entityToUpdate *model.Contact) error {
+	path := fmt.Sprintf("%scontacts(%s)", s.baseUrl, guid)
 
 	req, err := reqbuilder.NewODataReqBuilder(http.MethodPatch, path, bytes.NewReader(entityToUpdate.ToJSON())).
 		Build()
@@ -136,8 +136,8 @@ func (s *accountsService) Update(guid string, entityToUpdate *model.Account) err
 	return nil
 }
 
-func (s *accountsService) Delete(guid string) error {
-	path := fmt.Sprintf("%saccounts(%s)", s.baseUrl, guid)
+func (s *contactService) Delete(guid string) error {
+	path := fmt.Sprintf("%scontacts(%s)", s.baseUrl, guid)
 
 	req, err := reqbuilder.NewODataReqBuilder(http.MethodDelete, path, nil).
 		Build()
@@ -157,19 +157,19 @@ func (s *accountsService) Delete(guid string) error {
 	return nil
 }
 
-func buildGetNextResultFunction[T any](s DataverseService, pageLimit int) func(url string) (*model.GetManyResponse[T], error) {
-	return func(url string) (*model.GetManyResponse[T], error) {
-		req, err := reqbuilder.NewODataReqBuilder(http.MethodGet, url, nil).Build()
-		if err != nil {
-			return nil, err
-		}
+// func buildGetNextResultFunction[T any](s DataverseService, pageLimit int) func(url string) (*model.GetManyResponse[T], error) {
+// 	return func(url string) (*model.GetManyResponse[T], error) {
+// 		req, err := reqbuilder.NewODataReqBuilder(http.MethodGet, url, nil).Build()
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-		req.Header.Set("Prefer", fmt.Sprintf("odata.maxpagesize=%d", pageLimit))
+// 		req.Header.Set("Prefer", fmt.Sprintf("odata.maxpagesize=%d", pageLimit))
 
-		dr, err := s.Execute(req)
-		if err != nil {
-			return nil, err
-		}
-		return model.NewGetManyResponseFromJson[T](*dr.Body), nil
-	}
-}
+// 		dr, err := s.Execute(req)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return model.NewGetManyResponseFromJson[T](*dr.Body), nil
+// 	}
+// }

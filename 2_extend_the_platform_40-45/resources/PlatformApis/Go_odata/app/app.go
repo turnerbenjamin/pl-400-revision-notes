@@ -1,168 +1,296 @@
 package app
 
 import (
-	"fmt"
+	"errors"
 	"log"
 
+	"github.com/turnerbenjamin/go_odata/constants/authMode"
+	"github.com/turnerbenjamin/go_odata/constants/mainMenuOption"
 	"github.com/turnerbenjamin/go_odata/model"
 	"github.com/turnerbenjamin/go_odata/msal"
 	"github.com/turnerbenjamin/go_odata/service"
 	"github.com/turnerbenjamin/go_odata/view"
 )
 
+var ErrInvalidMenuSelection = errors.New("menu selection input is invalid")
+
+type AppConfig struct {
+	ClientId     string
+	TenantId     string
+	ClientSecret string
+	ResourceUrl  string
+	APIBaseUrl   string
+	Authority    string
+	PageLimit    int
+}
+
 type App interface {
-	Run()
+	Run() error
 }
 type app struct {
-	config           *AppConfig
-	dataverseService msal.DataverseService
-	accountsService  service.AccountsService
-	ui               view.UI
+	config              *AppConfig
+	dataverseService    service.DataverseService
+	accountsService     service.EntityService[*model.Account]
+	contactsService     service.EntityService[*model.Contact]
+	accountsListColumns []view.ListColumn[*model.Account]
+	contactsListColumns []view.ListColumn[*model.Contact]
+	ui                  view.UI
 }
 
-func Create(config AppConfig) App {
-	return &app{
+func Create(config AppConfig) (App, error) {
+	a := app{
 		config: &config,
 	}
+
+	err := a.initAccountListColumns()
+	if err != nil {
+		return nil, err
+	}
+
+	err = a.initContactListColumns()
+	if err != nil {
+		return nil, err
+	}
+
+	return &a, nil
 }
 
-func (a *app) Run() {
+func (a *app) Run() error {
 
-	a.ui = view.NewConsoleUI()
+	ui, err := view.NewConsoleUI()
+	if err != nil {
+		return err
+	}
+	a.ui = ui
 	defer a.ui.Exit()
 
-	authMode := a.getConfigInput()
-	a.InitialiseDataverseService(authMode)
-	a.startProgramLoop()
-}
-
-func (a *app) startProgramLoop() {
-	tableChoice := a.getTableChoiceInput()
-	for tableChoice != TABLE_MODE_EXIT {
-		a.startTableLoop(tableChoice)
-		tableChoice = a.getTableChoiceInput()
-	}
-}
-
-func (a *app) startTableLoop(tableChoice tableMode) {
-
-	tableAction := a.getTableActionInput(tableChoice)
-	for tableAction != TABLE_ACTION_BACK {
-		a.performTableAction(tableChoice, tableAction)
-		tableAction = a.getTableActionInput(tableChoice)
-	}
-}
-
-func (a *app) getConfigInput() authenticationMode {
-	output := a.ui.NavigateTo(GetConfigScreen())
-	return authenticationMode(output.GetUserInput())
-}
-
-func (a *app) getTableChoiceInput() tableMode {
-	output := a.ui.NavigateTo(GetTableMenuScreen())
-	return tableMode(output.GetUserInput())
-}
-
-func (a *app) getTableActionInput(tableChoice tableMode) tableAction {
-	output := a.ui.NavigateTo(GetTableActionMenuScreen(string(tableChoice)))
-	return tableAction(output.GetUserInput())
-}
-
-func (a *app) performTableAction(table tableMode, action tableAction) {
-	switch table {
-	case TABLE_MODE_ACCOUNT:
-		a.performAccountAction(action)
-	case TABLE_MODE_CONTACT:
-		a.performContactAction(action)
-	default:
-		log.Fatalf("Invalid table selection: %s", string(table))
-	}
-}
-
-func (a *app) performAccountAction(action tableAction) {
-	switch action {
-	case TABLE_ACTION_CREATE:
-		a.createAccountControl()
-	case TABLE_ACTION_LIST:
-		a.listAccountsControl()
-	default:
-		log.Fatalf("Invalid table action: %s", string(action))
-	}
-}
-
-func (a *app) performContactAction(action tableAction) {
-	switch action {
-	case TABLE_ACTION_CREATE:
-	default:
-		log.Fatalf("Invalid table action: %s", string(action))
-	}
-}
-
-func (a *app) createAccountControl() {
-	nis := getStringInputScreen("CREATE ACCOUNT", "Enter account name", "Name", true)
-	n := a.ui.NavigateTo(nis).GetUserInput()
-	cis := getStringInputScreen("CREATE ACCOUNT", "Enter account city", "City", false)
-	c := a.ui.NavigateTo(cis).GetUserInput()
-	account, err := a.accountsService.Create(&model.Account{Name: n, City: c})
-
+	authMode, err := a.getConfigInput()
 	if err != nil {
-		es := getErrorScreen(err.Error())
-		a.ui.NavigateTo(es)
-		return
+		return err
 	}
 
-	ss := getSuccessScreen(fmt.Sprintf("Created account: %s", account.Name))
-	a.ui.NavigateTo(ss)
+	err = a.InitialiseDataverseService(authMode)
+	if err != nil {
+		return err
+	}
+
+	return a.startProgramLoop()
 }
 
-func (a *app) listAccountsControl() {
+func (a *app) getConfigInput() (authMode.AuthenticationMode, error) {
+	configScreen, err := GetConfigScreen()
+	if err != nil {
+		return authMode.Invalid, err
+	}
 
-	res, err := a.accountsService.List("", 1)
-	for {
+	output, err := a.ui.NavigateTo(configScreen)
+	if err != nil {
+		return authMode.Invalid, err
+	}
+
+	return authMode.AuthenticationMode(output.UserInput()), nil
+}
+
+func (a *app) startProgramLoop() error {
+	mainMenuChoice, err := a.displayMainMenu()
+	if err != nil {
+		return err
+	}
+
+	for mainMenuChoice != mainMenuOption.Exit {
+		a.displayTable(mainMenuChoice)
+		mainMenuChoice, err = a.displayMainMenu()
 		if err != nil {
-			es := getErrorScreen(err.Error())
-			a.ui.NavigateTo(es)
-			break
+			return err
 		}
-		ls := GetAccountListScreen(res)
-		a.ui.NavigateTo(ls)
-		if !res.HasNext() {
-			break
-		}
-		res, err = res.GetNext()
 	}
-
+	return nil
 }
 
-func (a *app) InitialiseDataverseService(authMode authenticationMode) {
+func (a *app) displayMainMenu() (mainMenuOption.MainMenuOption, error) {
 
-	var getServiceFunc func(msal.ClientConfig) (msal.DataverseService, error)
-
-	switch authMode {
-	case CONFIG_APPLICATION_MODE:
-		getServiceFunc = msal.GetAppService
-	case CONFIG_USER_MODE:
-		getServiceFunc = msal.GetDelegatedService
-	default:
-		log.Panicf("invalid auth mode: %s", authMode)
+	mainMenuScreen, err := GetMainMenuScreen()
+	if err != nil {
+		return mainMenuOption.Invalid, err
 	}
 
-	dvs, err := getServiceFunc(msal.ClientConfig{
+	output, err := a.ui.NavigateTo(mainMenuScreen)
+	if err != nil {
+		return mainMenuOption.Invalid, err
+	}
+	return mainMenuOption.MainMenuOption(output.UserInput()), nil
+}
+
+func (a *app) displayTable(tableChoice mainMenuOption.MainMenuOption) error {
+	switch tableChoice {
+	case mainMenuOption.Accounts:
+		a.displayAccountsMenu()
+	case mainMenuOption.Contacts:
+		a.displayContactsMenu()
+	}
+	return nil
+}
+
+func (a *app) displayAccountsMenu() error {
+	accountsMenu := entityMenu[*model.Account]{
+		ui:          a.ui,
+		service:     a.accountsService,
+		listColumns: a.accountsListColumns,
+		getNewEntity: func() (*model.Account, error) {
+			return a.getAccountDetails(nil)
+		},
+		getUpdatedEntity: func(accountToUpdate *model.Account) (*model.Account, error) {
+			return a.getAccountDetails(accountToUpdate)
+		},
+		entityLabel: "Account",
+	}
+	return accountsMenu.run()
+}
+
+func (a *app) displayContactsMenu() error {
+	contactsMenu := entityMenu[*model.Contact]{
+		ui:          a.ui,
+		service:     a.contactsService,
+		listColumns: a.contactsListColumns,
+		getNewEntity: func() (*model.Contact, error) {
+			return a.getContactDetails(nil)
+		},
+		getUpdatedEntity: func(accountToUpdate *model.Contact) (*model.Contact, error) {
+			return a.getContactDetails(accountToUpdate)
+		},
+		entityLabel: "Account",
+	}
+	return contactsMenu.run()
+}
+
+func (a *app) getAccountDetails(defaultValues *model.Account) (*model.Account, error) {
+	defaultName := ""
+	defaultCity := ""
+
+	if defaultValues != nil {
+		defaultName = defaultValues.Name
+		defaultCity = defaultValues.City
+	}
+
+	enterNameOutput, err := a.getScreenOutput(func() (view.Screen, error) {
+		return newStringInputScreen("New Account", "Enter account name", "Name", defaultName, true)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	enterCityOutput, err := a.getScreenOutput(func() (view.Screen, error) {
+		return newStringInputScreen("New Account", "Enter city", "City", defaultCity, false)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Account{
+		Name: enterNameOutput.UserInput(),
+		City: enterCityOutput.UserInput(),
+	}, nil
+}
+
+func (a *app) getContactDetails(defaultValues *model.Contact) (*model.Contact, error) {
+	defaultFirstName := ""
+	defaultLastName := ""
+	defaultEmail := ""
+
+	if defaultValues != nil {
+		defaultFirstName = defaultValues.FirstName
+		defaultLastName = defaultValues.LastName
+		defaultEmail = defaultValues.Email
+	}
+
+	firstNameOutput, err := a.getScreenOutput(func() (view.Screen, error) {
+		return newStringInputScreen("New Contact", "Enter contact first name", "FirstName", defaultFirstName, true)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	lastNameOutput, err := a.getScreenOutput(func() (view.Screen, error) {
+		return newStringInputScreen("New Contact", "Enter contact last name", "LastName", defaultLastName, true)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	emailOutput, err := a.getScreenOutput(func() (view.Screen, error) {
+		return newStringInputScreen("New Contact", "Enter contact email", "Email", defaultEmail, false)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Contact{
+		FirstName: firstNameOutput.UserInput(),
+		LastName:  lastNameOutput.UserInput(),
+		Email:     emailOutput.UserInput(),
+	}, nil
+}
+
+func (a *app) getScreenOutput(getScreen func() (view.Screen, error)) (view.ScreenOutput, error) {
+	s, err := getScreen()
+	if err != nil {
+		return nil, err
+	}
+	return a.ui.NavigateTo(s)
+}
+
+func (a *app) InitialiseDataverseService(mode authMode.AuthenticationMode) error {
+
+	var getClientFunc func(msal.ClientOptions) (msal.DataverseClient, error)
+
+	switch mode {
+	case authMode.Application:
+		getClientFunc = msal.GetAppService
+	case authMode.User:
+		getClientFunc = msal.GetDelegatedService
+	default:
+		log.Panicf("invalid auth mode: %s", mode)
+	}
+
+	client, err := getClientFunc(msal.ClientOptions{
 		ClientId:     a.config.ClientId,
 		ResourceUrl:  a.config.ResourceUrl,
-		APIBaseUrl:   a.config.APIBaseUrl,
 		Authority:    a.config.Authority,
 		ClientSecret: a.config.ClientSecret,
 	})
-
 	if err != nil {
-		log.Panic(err.Error())
+		return err
 	}
 
-	err = dvs.Connect()
+	dataverseService, err := service.NewDataverseService(service.DataverseServiceOptions{
+		Client:  client,
+		BaseUrl: a.config.APIBaseUrl,
+	})
+
 	if err != nil {
-		log.Fatalf("Unable to connect: %s", err.Error())
+		return err
 	}
-	a.dataverseService = dvs
-	a.accountsService = service.NewAccountService(dvs)
+
+	a.dataverseService = dataverseService
+	a.accountsService = service.NewAccountService(dataverseService, a.config.APIBaseUrl, a.config.PageLimit)
+	a.contactsService = service.NewContactService(dataverseService, a.config.APIBaseUrl, a.config.PageLimit)
+	return nil
+}
+
+func (a *app) initAccountListColumns() error {
+	columns, err := model.AccountListColumns()
+	if err != nil {
+		return err
+	}
+	a.accountsListColumns = columns
+	return nil
+}
+
+func (a *app) initContactListColumns() error {
+	columns, err := model.ContactListColumns()
+	if err != nil {
+		return err
+	}
+	a.contactsListColumns = columns
+	return nil
 }
