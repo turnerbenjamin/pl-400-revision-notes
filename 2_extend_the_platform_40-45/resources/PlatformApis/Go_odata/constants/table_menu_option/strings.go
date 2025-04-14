@@ -1,4 +1,4 @@
-package tableMenuOption
+package table_menu_option
 
 type TableMenuOption string
 

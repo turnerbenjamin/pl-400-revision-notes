@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/turnerbenjamin/go_odata/constants/confirmoption"
-	"github.com/turnerbenjamin/go_odata/constants/tableMenuOption"
+	"github.com/turnerbenjamin/go_odata/constants/table_menu_option"
 	"github.com/turnerbenjamin/go_odata/service"
 	"github.com/turnerbenjamin/go_odata/view"
 )
@@ -42,16 +42,16 @@ func (em *entityMenu[T]) run() error {
 			return em.displayErrorScreen(err)
 		}
 
-		switch tableMenuOption.TableMenuOption(menuOutput.UserInput()) {
-		case tableMenuOption.Back:
+		switch table_menu_option.TableMenuOption(menuOutput.UserInput()) {
+		case table_menu_option.Back:
 			return nil
-		case tableMenuOption.Search:
+		case table_menu_option.Search:
 			err = em.setSearchTerm()
-		case tableMenuOption.Create:
+		case table_menu_option.Create:
 			err = em.createEntity()
-		case tableMenuOption.Update:
+		case table_menu_option.Update:
 			err = em.updateEntity(menuOutput.Target())
-		case tableMenuOption.Delete:
+		case table_menu_option.Delete:
 			err = em.deleteEntity(menuOutput.Target())
 		default:
 			err = errors.New("invalid menu option: " + menuOutput.UserInput())
@@ -79,6 +79,7 @@ func (em *entityMenu[T]) notifyNoErrorsFound() error {
 
 func (em *entityMenu[T]) displayEntityMenu(entityList view.EntityList[T]) (view.ScreenOutput, error) {
 	entityListScreen, err := NewEntityListScreen(
+		em.entityLabel,
 		listScreenOptions[T]{
 			entityList: entityList,
 			columns:    em.listColumns,

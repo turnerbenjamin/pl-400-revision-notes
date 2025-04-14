@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/turnerbenjamin/go_odata/constants/tableMenuOption"
+	"github.com/turnerbenjamin/go_odata/constants/table_menu_option"
 	"github.com/turnerbenjamin/go_odata/view"
 	"github.com/turnerbenjamin/go_odata/view/colours"
 )
@@ -27,27 +27,27 @@ func (lc listControl) GetKey() rune {
 var entityListControls = []view.ListControl{
 	listControl{
 		label: "Set/Clear search term",
-		value: string(tableMenuOption.Search),
+		value: string(table_menu_option.Search),
 		key:   's',
 	},
 	listControl{
 		label: "Create",
-		value: string(tableMenuOption.Create),
+		value: string(table_menu_option.Create),
 		key:   'c',
 	},
 	listControl{
 		label: "Update",
-		value: string(tableMenuOption.Update),
+		value: string(table_menu_option.Update),
 		key:   'u',
 	},
 	listControl{
 		label: "Delete",
-		value: string(tableMenuOption.Delete),
+		value: string(table_menu_option.Delete),
 		key:   'd',
 	},
 	listControl{
 		label: "Back to main menu",
-		value: string(tableMenuOption.Back),
+		value: string(table_menu_option.Back),
 		key:   'b',
 	},
 }
@@ -57,7 +57,7 @@ type listScreenOptions[T view.Entity] struct {
 	columns    []view.ListColumn[T]
 }
 
-func NewEntityListScreen[T view.Entity](listScreenOptions listScreenOptions[T]) (view.Screen, error) {
+func NewEntityListScreen[T view.Entity](entityLabel string, listScreenOptions listScreenOptions[T]) (view.Screen, error) {
 
 	listOptions := view.ListComponentOptions[T]{
 		Controls:   entityListControls,
@@ -71,7 +71,7 @@ func NewEntityListScreen[T view.Entity](listScreenOptions listScreenOptions[T]) 
 	}
 
 	return view.MakeScreen([]view.Component{
-		view.NewTitleComponent("ACCOUNTS", colours.Purple),
+		view.NewTitleComponent(entityLabel, colours.Purple),
 		listComponent,
 	})
 }

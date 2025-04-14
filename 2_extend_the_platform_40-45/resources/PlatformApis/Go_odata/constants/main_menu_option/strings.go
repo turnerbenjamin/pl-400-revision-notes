@@ -1,4 +1,4 @@
-package mainMenuOption
+package main_menu_option
 
 type MainMenuOption string
 

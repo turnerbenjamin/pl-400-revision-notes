@@ -5,18 +5,17 @@ package view
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/eiannone/keyboard"
 	"github.com/turnerbenjamin/go_odata/constants/ansi"
-	"golang.org/x/term"
+	"github.com/turnerbenjamin/go_odata/utilities"
 )
 
 // minimumScreenHeightForPartialRefresh defines the minimum terminal height
 // required to perform partial screen refreshes. If the terminal is smaller
 // than this value, a full refresh will be performed instead.
 const (
-	minimumScreenHeightForPartialRefresh = 2
+	minimumScreenHeightForPartialRefresh = 22
 )
 
 // ErrNoInteractiveComponent is returned when attempting to create a Screen
@@ -165,10 +164,8 @@ func (s *screen) handleKeyboardInput(char rune, key keyboard.Key) (*updateRespon
 // based on terminal size and internal state. It also updates the internal
 // refresh flag based on current terminal dimensions.
 func (s *screen) shouldDoFullRefresh() bool {
-	_, height, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		height = minimumScreenHeightForPartialRefresh - 1
-	}
+	height := utilities.GetConsoleHeight(minimumScreenHeightForPartialRefresh - 1)
+
 	currentValue := s.needsFullRefresh
 	s.needsFullRefresh = height < minimumScreenHeightForPartialRefresh
 	return currentValue || s.needsFullRefresh

@@ -1,6 +1,6 @@
-// Package consoleinputreader provides a simple interface for reading keyboard input from the console.
+// Package console_input_reader provides a simple interface for reading keyboard input from the console.
 // It wraps the github.com/eiannone/keyboard package to allow for dependency injection and easier testing.
-package consoleinputreader
+package console_input_reader
 
 import (
 	"github.com/eiannone/keyboard"

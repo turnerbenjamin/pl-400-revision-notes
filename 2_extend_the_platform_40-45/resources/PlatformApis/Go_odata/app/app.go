@@ -3,9 +3,11 @@ package app
 import (
 	"errors"
 	"log"
+	"net/url"
 
-	"github.com/turnerbenjamin/go_odata/constants/authMode"
-	"github.com/turnerbenjamin/go_odata/constants/mainMenuOption"
+	"github.com/turnerbenjamin/go_odata/constants/auth_mode"
+	"github.com/turnerbenjamin/go_odata/constants/logical_names"
+	"github.com/turnerbenjamin/go_odata/constants/main_menu_option"
 	"github.com/turnerbenjamin/go_odata/model"
 	"github.com/turnerbenjamin/go_odata/msal"
 	"github.com/turnerbenjamin/go_odata/service"
@@ -77,18 +79,18 @@ func (a *app) Run() error {
 	return a.startProgramLoop()
 }
 
-func (a *app) getConfigInput() (authMode.AuthenticationMode, error) {
+func (a *app) getConfigInput() (auth_mode.AuthenticationMode, error) {
 	configScreen, err := GetConfigScreen()
 	if err != nil {
-		return authMode.Invalid, err
+		return auth_mode.Invalid, err
 	}
 
 	output, err := a.ui.NavigateTo(configScreen)
 	if err != nil {
-		return authMode.Invalid, err
+		return auth_mode.Invalid, err
 	}
 
-	return authMode.AuthenticationMode(output.UserInput()), nil
+	return auth_mode.AuthenticationMode(output.UserInput()), nil
 }
 
 func (a *app) startProgramLoop() error {
@@ -97,7 +99,7 @@ func (a *app) startProgramLoop() error {
 		return err
 	}
 
-	for mainMenuChoice != mainMenuOption.Exit {
+	for mainMenuChoice != main_menu_option.Exit {
 		a.displayTable(mainMenuChoice)
 		mainMenuChoice, err = a.displayMainMenu()
 		if err != nil {
@@ -107,25 +109,25 @@ func (a *app) startProgramLoop() error {
 	return nil
 }
 
-func (a *app) displayMainMenu() (mainMenuOption.MainMenuOption, error) {
+func (a *app) displayMainMenu() (main_menu_option.MainMenuOption, error) {
 
 	mainMenuScreen, err := GetMainMenuScreen()
 	if err != nil {
-		return mainMenuOption.Invalid, err
+		return main_menu_option.Invalid, err
 	}
 
 	output, err := a.ui.NavigateTo(mainMenuScreen)
 	if err != nil {
-		return mainMenuOption.Invalid, err
+		return main_menu_option.Invalid, err
 	}
-	return mainMenuOption.MainMenuOption(output.UserInput()), nil
+	return main_menu_option.MainMenuOption(output.UserInput()), nil
 }
 
-func (a *app) displayTable(tableChoice mainMenuOption.MainMenuOption) error {
+func (a *app) displayTable(tableChoice main_menu_option.MainMenuOption) error {
 	switch tableChoice {
-	case mainMenuOption.Accounts:
+	case main_menu_option.Accounts:
 		a.displayAccountsMenu()
-	case mainMenuOption.Contacts:
+	case main_menu_option.Contacts:
 		a.displayContactsMenu()
 	}
 	return nil
@@ -158,7 +160,7 @@ func (a *app) displayContactsMenu() error {
 		getUpdatedEntity: func(accountToUpdate *model.Contact) (*model.Contact, error) {
 			return a.getContactDetails(accountToUpdate)
 		},
-		entityLabel: "Account",
+		entityLabel: "Contact",
 	}
 	return contactsMenu.run()
 }
@@ -239,14 +241,14 @@ func (a *app) getScreenOutput(getScreen func() (view.Screen, error)) (view.Scree
 	return a.ui.NavigateTo(s)
 }
 
-func (a *app) InitialiseDataverseService(mode authMode.AuthenticationMode) error {
+func (a *app) InitialiseDataverseService(mode auth_mode.AuthenticationMode) error {
 
 	var getClientFunc func(msal.ClientOptions) (msal.DataverseClient, error)
 
 	switch mode {
-	case authMode.Application:
+	case auth_mode.Application:
 		getClientFunc = msal.GetAppService
-	case authMode.User:
+	case auth_mode.User:
 		getClientFunc = msal.GetDelegatedService
 	default:
 		log.Panicf("invalid auth mode: %s", mode)
@@ -263,17 +265,50 @@ func (a *app) InitialiseDataverseService(mode authMode.AuthenticationMode) error
 	}
 
 	dataverseService, err := service.NewDataverseService(service.DataverseServiceOptions{
-		Client:  client,
-		BaseUrl: a.config.APIBaseUrl,
+		Client: client,
 	})
 
 	if err != nil {
 		return err
 	}
 
+	err = dataverseService.TestConnection()
+	if err != nil {
+		return err
+	}
+
 	a.dataverseService = dataverseService
-	a.accountsService = service.NewAccountService(dataverseService, a.config.APIBaseUrl, a.config.PageLimit)
-	a.contactsService = service.NewContactService(dataverseService, a.config.APIBaseUrl, a.config.PageLimit)
+
+	baseUrl, err := url.Parse(a.config.APIBaseUrl)
+	if err != nil {
+		return err
+	}
+
+	baseEntityServiceOptions := &service.EntityServiceOptions{
+		DataverseService: dataverseService,
+		BaseUrl:          baseUrl,
+		PageLimit:        a.config.PageLimit,
+	}
+
+	accountServiceOptions := *baseEntityServiceOptions
+	accountServiceOptions.ResourcePath = logical_names.TableAccountResource
+	accountServiceOptions.SearchFields = []string{
+		logical_names.ColumnAccountName,
+		logical_names.ColumnAccountCity,
+	}
+	accountServiceOptions.SelectsFields = append(accountServiceOptions.SearchFields, logical_names.ColumnAccountId)
+	a.accountsService = service.NewEntityService[*model.Account](accountServiceOptions)
+
+	contactServiceOptions := *baseEntityServiceOptions
+	contactServiceOptions.ResourcePath = logical_names.TableContactResource
+	contactServiceOptions.SearchFields = []string{
+		logical_names.ColumnContactFirstName,
+		logical_names.ColumnContactLastName,
+		logical_names.ColumnContactEmail,
+	}
+
+	contactServiceOptions.SelectsFields = append(contactServiceOptions.SearchFields, logical_names.ColumnContactId)
+	a.contactsService = service.NewEntityService[*model.Contact](contactServiceOptions)
 	return nil
 }
 

@@ -5,7 +5,7 @@ package view
 import (
 	"errors"
 
-	"github.com/turnerbenjamin/go_odata/view/consoleinputreader"
+	"github.com/turnerbenjamin/go_odata/view/console_input_reader"
 )
 
 // ErrNilScreen is returned when attempting to navigate to a nil screen.
@@ -31,7 +31,7 @@ type consoleUI struct {
 	// currentScreen holds the active screen being displayed to the user
 	currentScreen Screen
 	// inputReader provides terminal input capabilities
-	inputReader consoleinputreader.InputReader
+	inputReader console_input_reader.InputReader
 }
 
 // NewConsoleUI creates and initializes a new console UI controller.
@@ -39,7 +39,7 @@ type consoleUI struct {
 // interface.
 // Returns an error if the input reader cannot be initialized.
 func NewConsoleUI() (UI, error) {
-	ir := consoleinputreader.NewInputReader()
+	ir := console_input_reader.NewInputReader()
 	err := ir.Open()
 	if err != nil {
 		return nil, err

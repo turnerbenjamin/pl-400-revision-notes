@@ -1,4 +1,4 @@
-package authMode
+package auth_mode
 
 type AuthenticationMode string
 

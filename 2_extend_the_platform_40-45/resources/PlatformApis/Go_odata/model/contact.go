@@ -1,9 +1,7 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/turnerbenjamin/go_odata/view"
 )
@@ -13,20 +11,6 @@ type Contact struct {
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
 	Email     string `json:"emailaddress1,omitempty"`
-}
-
-func (a *Contact) ToJSON() []byte {
-	body, err := json.Marshal(a)
-	if err != nil {
-		log.Fatal("failed to serialise contact")
-	}
-	return body
-}
-
-func NewContactFromJson(accountJson []byte) *Contact {
-	var contact Contact
-	json.Unmarshal(accountJson, &contact)
-	return &contact
 }
 
 func ContactListColumns() ([]view.ListColumn[*Contact], error) {

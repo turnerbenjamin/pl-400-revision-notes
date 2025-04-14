@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/turnerbenjamin/go_odata/constants/authMode"
+	"github.com/turnerbenjamin/go_odata/constants/auth_mode"
 	"github.com/turnerbenjamin/go_odata/view"
 	"github.com/turnerbenjamin/go_odata/view/colours"
 )
@@ -9,8 +9,8 @@ import (
 func GetConfigScreen() (view.Screen, error) {
 
 	menu, err := view.NewMenuComponent([]string{
-		string(authMode.Application),
-		string(authMode.User),
+		string(auth_mode.Application),
+		string(auth_mode.User),
 	},
 	)
 
