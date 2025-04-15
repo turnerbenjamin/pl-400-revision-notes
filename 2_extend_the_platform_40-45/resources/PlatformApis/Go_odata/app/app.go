@@ -369,5 +369,6 @@ func (a *app) displayErrorScreen(originalError error) error {
 	if err != nil {
 		return originalError
 	}
+	a.ui.Exit()
 	return nil
 }

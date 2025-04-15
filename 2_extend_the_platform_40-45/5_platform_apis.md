@@ -31,37 +31,41 @@ concerns:
 To authenticate an application, the app must be registered with Entra Id by
 creating an App registration.
 
-### App Registration Account Types
-
-When creating an app registration there are four options for supported account
-types:
-
-- Accounts in this org directory: Target audience is internal
-- Accounts in any org directory: Target is business and educational customers or
-to support multi-tenancy
-- Accounts in any org directory + personal MS accounts
-- personal MS accounts only
-
-### Authentication
+### Authentication Methods
 
 There are two methods of authentication for an application accessing the
 Dataverse:
 
-- Acting on behalf of an interactive user
-- Acting directly with S2S authentication
+- Direct using S2S authentication
+- Delegated, acting on behalf of an interactive user
 
-#### Acting on Behalf of an Interactive User
+In both cases, we need to first create application registration for the client
+in EntraId
+
+#### Direct Authentication
+
+To set-up direct authentication, we need to create a client secret or
+certificate. This can then be used to authenticate as the application.
+
+When authenticating with this method, the app is acting on its own behalf.
+Accordingly, appropriate permissions will need to be set-up for the app itself.
+In the context of Dataverse, this involves:
+
+- Registering an app user in the relevant environment/s linked to the EntraID
+app registration
+- Adding the required permissions for this user
+
+#### Delegated Authentication
+
+With delegated authentication, we do not need to set up a client secret or
+certificate. The credentials are provided by the interactive user, e.g. using
+oAuth 2.0.
+
+However,
 
 To act on behalf of an interactive user, we need to set-up the API permissions
 on the application registration. Specifically, the user_impersonation delegated
 permission is required for Dynamics CRM.
-
-#### Acting Directly with S2S Authentication
-
-If acting directly with S2S authentication, an application user will need to be
-set up in each Dataverse environment through admin.powerplatform. The app user
-may then be associated with an Entra Id app or managed identity. The Dataverse
-security roles for the application user can be configured in power platform.
 
 #### Microsoft Authentication Libraries (MSAL)
 

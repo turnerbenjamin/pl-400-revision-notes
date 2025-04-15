@@ -194,7 +194,7 @@ func (lc *listComponent[T]) renderControls() {
 // buildRowString joins an array of cell strings with column dividers and
 // applies the specified color formatting.
 func (lc *listComponent[T]) buildRowString(cells []string, colour colours.Colour) string {
-	formattedDivider := colours.ApplyColour(listColDivider, colours.Reset)
+	formattedDivider := fmt.Sprintf("%s%s%s", colours.Reset, listColDivider, colour)
 	return colours.ApplyColour(strings.Join(cells, formattedDivider), colour)
 }
 

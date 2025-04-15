@@ -116,6 +116,7 @@ func NewEntityService[T view.Entity](options EntityServiceOptions) EntityService
 // server-generated fields populated.
 func (s *entityService[T]) Create(entity T) (T, error) {
 
+	//e.g. [Organization URI]/api/data/v9.2/accounts
 	path := s.resourceUrl.String()
 	payload, err := json.Marshal(entity)
 	if err != nil {
@@ -153,6 +154,7 @@ func (s *entityService[T]) Create(entity T) (T, error) {
 // needed.
 func (s *entityService[T]) List(searchTerm string) (view.EntityList[T], error) {
 
+	//e.g. [Organization URI]/api/data/v9.2/accounts
 	path := s.resourceUrl.String()
 	rb := requestBuilder.NewRequestBuilder(http.MethodGet, path, nil).
 		AddQueryParam(queryParamKeySelect, s.selects)
@@ -192,6 +194,7 @@ func (s *entityService[T]) List(searchTerm string) (view.EntityList[T], error) {
 // Get retrieves a single entity by its unique identifier (GUID).
 func (s *entityService[T]) Get(guid string) (T, error) {
 
+	//e.g. [Organization URI]/api/data/v9.2/accounts(guid)
 	path := s.buildUrlWithGuid(guid)
 	req, err := requestBuilder.NewRequestBuilder(http.MethodGet, path, nil).
 		AddQueryParam(queryParamKeySelect, s.selects).
@@ -225,6 +228,7 @@ func (s *entityService[T]) Get(guid string) (T, error) {
 // from entityToUpdate.
 func (s *entityService[T]) Update(guid string, entityToUpdate T) error {
 
+	//e.g. [Organization URI]/api/data/v9.2/accounts(guid)
 	path := s.buildUrlWithGuid(guid)
 	payload, err := json.Marshal(entityToUpdate)
 
@@ -254,6 +258,7 @@ func (s *entityService[T]) Update(guid string, entityToUpdate T) error {
 // Delete removes an entity identified by its GUID.
 func (s *entityService[T]) Delete(guid string) error {
 
+	//e.g. [Organization URI]/api/data/v9.2/accounts(guid)
 	path := s.buildUrlWithGuid(guid)
 	req, err := requestBuilder.NewRequestBuilder(http.MethodDelete, path, nil).
 		Build()
