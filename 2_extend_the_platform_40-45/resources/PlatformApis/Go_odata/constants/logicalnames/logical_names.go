@@ -1,5 +1,9 @@
-package logical_names
+// Package logicalnames provides constants for entity and field logical names
+// used when interacting with Microsoft Dataverse through the Web API.
+package logicalnames
 
+// Constants representing entity and field logical names in Microsoft Dataverse.
+// These are used when constructing OData queries and processing API responses.
 const (
 	TableAccount           = "account"
 	TableAccountResource   = "accounts"

@@ -293,12 +293,12 @@ func (lc *listComponent[T]) handleCustomControlInput(char rune) (*updateResponse
 	}
 
 	for _, ci := range lc.customControls {
-		if ci.GetKey() == char {
+		if ci.Key() == char {
 			target := lc.data[lc.selected]
 
 			return newUpdateResponse().
 				setContinue(false).
-				setUserInput(ci.GetValue()).
+				setUserInput(ci.Value()).
 				setTarget(target.ID()), nil
 		}
 	}
@@ -442,7 +442,7 @@ func (lc *listComponent[T]) buildNavigationControlsString() string {
 func (lc *listComponent[T]) buildCustomControlsString() string {
 	var builder strings.Builder
 	for _, ctl := range lc.customControls {
-		builder.WriteString(lc.getControlString(string(ctl.GetKey()), ctl.GetLabel(), true))
+		builder.WriteString(lc.getControlString(string(ctl.Key()), ctl.Label(), true))
 	}
 	return builder.String()
 }

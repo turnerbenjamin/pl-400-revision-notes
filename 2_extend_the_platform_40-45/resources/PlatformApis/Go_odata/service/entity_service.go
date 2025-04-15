@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/turnerbenjamin/go_odata/model"
-	requestbuilder "github.com/turnerbenjamin/go_odata/request_builder"
+	requestBuilder "github.com/turnerbenjamin/go_odata/request_builder"
 	"github.com/turnerbenjamin/go_odata/view"
 )
 
@@ -122,7 +122,7 @@ func (s *entityService[T]) Create(entity T) (T, error) {
 		return s.zeroValue, fmt.Errorf("failed to serialise entity %w", err)
 	}
 
-	req, err := requestbuilder.NewRequestBuilder(http.MethodPost, path, bytes.NewReader(payload)).
+	req, err := requestBuilder.NewRequestBuilder(http.MethodPost, path, bytes.NewReader(payload)).
 		Build()
 	if err != nil {
 		return s.zeroValue, err
@@ -137,7 +137,7 @@ func (s *entityService[T]) Create(entity T) (T, error) {
 	}
 
 	if !res.IsSuccessful {
-		errMsg := model.ParseErrorMessage(res.Body)
+		errMsg := s.ParseErrorMessage(res.Body)
 		return s.zeroValue, errors.New(errMsg)
 	}
 
@@ -154,7 +154,7 @@ func (s *entityService[T]) Create(entity T) (T, error) {
 func (s *entityService[T]) List(searchTerm string) (view.EntityList[T], error) {
 
 	path := s.resourceUrl.String()
-	rb := requestbuilder.NewRequestBuilder(http.MethodGet, path, nil).
+	rb := requestBuilder.NewRequestBuilder(http.MethodGet, path, nil).
 		AddQueryParam(queryParamKeySelect, s.selects)
 
 	if searchTerm != "" && len(s.searchFields) > 0 {
@@ -176,11 +176,15 @@ func (s *entityService[T]) List(searchTerm string) (view.EntityList[T], error) {
 	}
 
 	if !res.IsSuccessful {
-		errMsg := model.ParseErrorMessage(res.Body)
+		errMsg := s.ParseErrorMessage(res.Body)
 		return nil, errors.New(errMsg)
 	}
 
-	gmr := model.NewGetManyResponseFromJson[T](res.Body)
+	gmr := &model.GetManyResponse[T]{}
+	err = json.Unmarshal(res.Body, gmr)
+	if err != nil {
+		return nil, err
+	}
 
 	return model.CreateEntityList(*gmr, s.getNextResult), nil
 }
@@ -189,7 +193,7 @@ func (s *entityService[T]) List(searchTerm string) (view.EntityList[T], error) {
 func (s *entityService[T]) Get(guid string) (T, error) {
 
 	path := s.buildUrlWithGuid(guid)
-	req, err := requestbuilder.NewRequestBuilder(http.MethodGet, path, nil).
+	req, err := requestBuilder.NewRequestBuilder(http.MethodGet, path, nil).
 		AddQueryParam(queryParamKeySelect, s.selects).
 		Build()
 	if err != nil {
@@ -202,7 +206,7 @@ func (s *entityService[T]) Get(guid string) (T, error) {
 	}
 
 	if !res.IsSuccessful {
-		errMsg := model.ParseErrorMessage(res.Body)
+		errMsg := s.ParseErrorMessage(res.Body)
 		return s.zeroValue, errors.New(errMsg)
 	}
 
@@ -227,7 +231,7 @@ func (s *entityService[T]) Update(guid string, entityToUpdate T) error {
 	if err != nil {
 		return fmt.Errorf("failed to serialise entity %w", err)
 	}
-	req, err := requestbuilder.NewRequestBuilder(http.MethodPatch, path, bytes.NewReader(payload)).
+	req, err := requestBuilder.NewRequestBuilder(http.MethodPatch, path, bytes.NewReader(payload)).
 		Build()
 	if err != nil {
 		return err
@@ -241,7 +245,7 @@ func (s *entityService[T]) Update(guid string, entityToUpdate T) error {
 	}
 
 	if !res.IsSuccessful {
-		errMsg := model.ParseErrorMessage(res.Body)
+		errMsg := s.ParseErrorMessage(res.Body)
 		return errors.New(errMsg)
 	}
 	return nil
@@ -251,7 +255,7 @@ func (s *entityService[T]) Update(guid string, entityToUpdate T) error {
 func (s *entityService[T]) Delete(guid string) error {
 
 	path := s.buildUrlWithGuid(guid)
-	req, err := requestbuilder.NewRequestBuilder(http.MethodDelete, path, nil).
+	req, err := requestBuilder.NewRequestBuilder(http.MethodDelete, path, nil).
 		Build()
 	if err != nil {
 		return err
@@ -263,7 +267,7 @@ func (s *entityService[T]) Delete(guid string) error {
 	}
 
 	if !res.IsSuccessful {
-		errMsg := model.ParseErrorMessage(res.Body)
+		errMsg := s.ParseErrorMessage(res.Body)
 		return errors.New(errMsg)
 	}
 	return nil
@@ -292,7 +296,7 @@ func (s *entityService[T]) buildFilterQuery(searchTerm string) string {
 // getNextResult fetches the next page of results during list pagination
 // using the provided URL from the previous response's "@odata.nextLink".
 func (s *entityService[T]) getNextResult(url string) (*model.GetManyResponse[T], error) {
-	req, err := requestbuilder.NewRequestBuilder(http.MethodGet, url, nil).Build()
+	req, err := requestBuilder.NewRequestBuilder(http.MethodGet, url, nil).Build()
 	if err != nil {
 		return nil, err
 	}
@@ -303,5 +307,20 @@ func (s *entityService[T]) getNextResult(url string) (*model.GetManyResponse[T],
 	if err != nil {
 		return nil, err
 	}
-	return model.NewGetManyResponseFromJson[T](dr.Body), nil
+
+	gmr := &model.GetManyResponse[T]{}
+	err = json.Unmarshal(dr.Body, gmr)
+	if err != nil {
+		return nil, err
+	}
+	return gmr, err
+}
+
+func (s *entityService[T]) ParseErrorMessage(body []byte) string {
+	errMsg := body
+	var errRes model.ErrorResponse
+	if err := json.Unmarshal(errMsg, &errRes); err == nil {
+		errMsg = []byte(errRes.Error.Message)
+	}
+	return string(errMsg)
 }

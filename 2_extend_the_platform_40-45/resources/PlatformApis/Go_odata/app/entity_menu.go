@@ -1,28 +1,42 @@
+// Package app implements the application-level functionality for the OData
+// client, including screens, navigation, and business logic.
 package app
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/turnerbenjamin/go_odata/constants/confirmoption"
-	"github.com/turnerbenjamin/go_odata/constants/table_menu_option"
+	confirmOption "github.com/turnerbenjamin/go_odata/constants/confirm_option"
+	tableMenuOption "github.com/turnerbenjamin/go_odata/constants/tablemenuoption"
 	"github.com/turnerbenjamin/go_odata/service"
 	"github.com/turnerbenjamin/go_odata/view"
 )
 
+// entityMenu provides CRUD (Create, Read, Update, Delete) functionality for a
+// generic entity type T.
+// It manages the UI navigation flow and interactions with the entity service.
 type entityMenu[T view.Entity] struct {
-	ui               view.UI
-	service          service.EntityService[T]
-	listColumns      []view.ListColumn[T]
-	getNewEntity     func() (T, error)
+	// User interface instance for screen navigation
+	ui view.UI
+	// Service for entity operations
+	service service.EntityService[T]
+	// Column definitions for entity list display
+	listColumns []view.ListColumn[T]
+	// Function to get data for a new entity
+	getNewEntity func() (T, error)
+	// Function to get updated data for an existing entity
 	getUpdatedEntity func(T) (T, error)
-	entityLabel      string
-	searchTerm       string
+	// Human-readable label for this entity type
+	entityLabel string
+	// Current search term for filtering entities
+	searchTerm string
 }
 
+// run starts the entity menu's main loop, handling user interactions until
+// exit. It fetches and displays entities, processes user commands, and manages
+// errors.
+// Returns an error if any operation fails.
 func (em *entityMenu[T]) run() error {
 	for {
-
 		entityList, err := em.service.List(em.searchTerm)
 		if err != nil {
 			return em.displayErrorScreen(err)
@@ -42,19 +56,19 @@ func (em *entityMenu[T]) run() error {
 			return em.displayErrorScreen(err)
 		}
 
-		switch table_menu_option.TableMenuOption(menuOutput.UserInput()) {
-		case table_menu_option.Back:
+		switch tableMenuOption.TableMenuOption(menuOutput.UserInput()) {
+		case tableMenuOption.Back:
 			return nil
-		case table_menu_option.Search:
+		case tableMenuOption.Search:
 			err = em.setSearchTerm()
-		case table_menu_option.Create:
+		case tableMenuOption.Create:
 			err = em.createEntity()
-		case table_menu_option.Update:
+		case tableMenuOption.Update:
 			err = em.updateEntity(menuOutput.Target())
-		case table_menu_option.Delete:
+		case tableMenuOption.Delete:
 			err = em.deleteEntity(menuOutput.Target())
 		default:
-			err = errors.New("invalid menu option: " + menuOutput.UserInput())
+			err = fmt.Errorf("invalid menu option %s", menuOutput.UserInput())
 		}
 
 		if err != nil {
@@ -63,6 +77,9 @@ func (em *entityMenu[T]) run() error {
 	}
 }
 
+// notifyNoErrorsFound displays a message when no entities match the current
+// search criteria.
+// Returns an error if the notification screen cannot be displayed.
 func (em *entityMenu[T]) notifyNoErrorsFound() error {
 	is, err := newInfoScreen("No rows found")
 	if err != nil {
@@ -70,15 +87,14 @@ func (em *entityMenu[T]) notifyNoErrorsFound() error {
 	}
 
 	_, err = em.ui.NavigateTo(is)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
+// displayEntityMenu creates and shows the entity list screen with the provided
+// entity data.
+// Returns the user's selection and any error encountered.
 func (em *entityMenu[T]) displayEntityMenu(entityList view.EntityList[T]) (view.ScreenOutput, error) {
-	entityListScreen, err := NewEntityListScreen(
+	entityListScreen, err := newEntityListScreen(
 		em.entityLabel,
 		listScreenOptions[T]{
 			entityList: entityList,
@@ -96,20 +112,29 @@ func (em *entityMenu[T]) displayEntityMenu(entityList view.EntityList[T]) (view.
 	return outputs, nil
 }
 
+// createEntity handles the workflow for creating a new entity.
+// It prompts for entity data, calls the service to create it, and displays a
+// success message.
+// Returns an error if any step in the process fails.
 func (em *entityMenu[T]) createEntity() error {
 	entityToCreate, err := em.getNewEntity()
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 
 	newEntity, err := em.service.Create(entityToCreate)
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 	successMessage := fmt.Sprintf("%s: %s", em.entityLabel, newEntity.Label())
 	return em.displaySuccessScreen(successMessage)
 }
 
+// updateEntity handles the workflow for updating an existing entity.
+// It fetches the current entity data, prompts for updates, calls the service to
+// update it, and displays a success message.
+// The guid parameter identifies the entity to update.
+// Returns an error if any step in the process fails.
 func (em *entityMenu[T]) updateEntity(guid string) error {
 	currentEntity, err := em.service.Get(guid)
 	if err != nil {
@@ -128,20 +153,28 @@ func (em *entityMenu[T]) updateEntity(guid string) error {
 	return em.displaySuccessScreen(successMsg)
 }
 
+// deleteEntity handles the workflow for deleting an existing entity.
+// It fetches the entity data, prompts for confirmation, calls the service to
+// delete it, and displays a success message if confirmed.
+// The guid parameter identifies the entity to delete.
+// Returns an error if any step in the process fails.
 func (em *entityMenu[T]) deleteEntity(guid string) error {
 	entityToDelete, err := em.service.Get(guid)
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 	msg := fmt.Sprintf("Are you sure you want to delete %s", entityToDelete.Label())
 	confirmationScreen, err := NewConfirmationScreen(msg)
+	if err != nil {
+		return err
+	}
 
 	response, err := em.ui.NavigateTo(confirmationScreen)
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 
-	if confirmoption.ConfirmOption(response.UserInput()) != confirmoption.Yes {
+	if confirmOption.ConfirmOption(response.UserInput()) != confirmOption.Yes {
 		return nil
 	}
 
@@ -153,13 +186,16 @@ func (em *entityMenu[T]) deleteEntity(guid string) error {
 	return em.displaySuccessScreen(successMsg)
 }
 
+// setSearchTerm prompts the user to enter a search term for filtering entities.
+// An empty search term clears the filter.
+// Returns an error if the input screen cannot be displayed.
 func (em *entityMenu[T]) setSearchTerm() error {
 	title := fmt.Sprintf("Set search term: %ss", em.entityLabel)
 	msg := "Enter a search term (or leave blank to unset)"
 
 	inputScreen, err := newStringInputScreen(title, msg, "SearchTerm", em.searchTerm, false)
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 
 	inputScreenOutputs, err := em.ui.NavigateTo(inputScreen)
@@ -171,17 +207,22 @@ func (em *entityMenu[T]) setSearchTerm() error {
 	return nil
 }
 
+// displaySuccessScreen shows a success message to the user.
+// Returns an error if the success screen cannot be displayed.
 func (em *entityMenu[T]) displaySuccessScreen(message string) error {
 	ss, err := newSuccessScreen(message)
 	if err != nil {
-		return em.displayErrorScreen(err)
+		return err
 	}
 	_, err = em.ui.NavigateTo(ss)
 	return err
 }
 
+// displayErrorScreen shows an error message to the user.
+// Returns the original error if displaying the error screen fails,
+// otherwise returns nil to indicate the error was displayed successfully.
 func (em *entityMenu[T]) displayErrorScreen(originalError error) error {
-	es, err := getErrorScreen(originalError.Error())
+	es, err := newErrorScreen(originalError.Error())
 	if err != nil {
 		return originalError
 	}
