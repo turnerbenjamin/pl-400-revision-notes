@@ -2,19 +2,18 @@
 
 ## Introduction
 
-Unlike OrganisationService, Web API is platform agnostic, so I decided to build
-a client in Go. Looking back, the process did not teach me much about using the
-WebApi. The App and the code are both pretty useless in that regard, however, I
-have found the app useful when learning about authentication.
+The intention for this project was to build a console based WebApi client in Go.
+This was a fun project to build but it was not particularly useful in terms of
+learning about working with the API.
+
+However, this project was unexpectedly useful in learning about authentication.
 
 ## Authentication
 
 This demo will run the application without any credentials or Azure/Dataverse
 configuration. It will work through the errors to authenticate using both app
-only access and delegated access.
-
-To start, create a .env file in the root directory of the application, as
-follows
+only access and delegated access. To start, create a .env file in the root
+directory of the application, as follows:
 
 ```
 CLIENT_ID=
