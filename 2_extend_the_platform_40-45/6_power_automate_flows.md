@@ -1,5 +1,7 @@
 # Configure Power Automate Cloud Flows
 
+## Introduction
+
 ## Implement Flow Steps to use Dataverse Connector Actions and Triggers
 
 ### What we Need to Know

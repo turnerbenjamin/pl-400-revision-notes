@@ -1,5 +1,7 @@
 # Configure and Troubleshoot Power Platform
 
+## Complete Testing and Performance Checks in a Canvas App
+
 ## Troubleshoot Operational Security Issues Found in Testing
 
 ### What we Need to Know
@@ -28,10 +30,3 @@
 - Column-level security
   - Setting this up
 - Principle of least privilege
-
-## Manage Power Platform Environments for Development
-
-### What we Need to Know
-
-- How we can create environments
-- How we can manage environments

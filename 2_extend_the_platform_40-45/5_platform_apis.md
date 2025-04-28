@@ -1,142 +1,319 @@
 # Use Platform APIs
 
-This section relates to the two platform APIS:
+Platform APIs relates to:
 
-- Web APi
+- Web API
 - Organisation Service
 
 The organisation service is covered in detail in the plug-ins document as it is
 the preferred choice in that context. This document will focus primarily on the
 Web API.
 
-Web API is an OData v4 service. Using this open standard helps to improve
-cross-platform compatibility. There is no specific Dataverse tooling for the
-WebApi, instead, we can use language specific OData libraries. We can write
-queries using both either syntax and FetchXml.
+## Web API
 
-We should use use the WebApi unless:
+Web API is an OData v4 service. Using this open standard helps to improve
+cross-platform compatibility.
+
+When choosing between Organisation Service and Web API, we should always go with
+Web API unless:
 
 - We are writing dotnet code, AND
-- The code is written for a plugin or the project is a Windows client
+- The code is written in the context of a plugin or Windows client
 
-## Authentication and Authorisation
+### Authentication and Authorisation
 
-Microsoft use Microsoft Entra Id for authentication. Once authenticated, access
-to the resource can be controlled with RBAC. So, there is a separation of
-concerns:
+Microsoft Entra ID is used for authentication. Once authenticated, access to the
+resource can be controlled with RBAC. So, there is a separation of concerns:
 
 - OAuth: Authentication
 - RBAC: Authorisation
 
 To authenticate an application, the app must be registered with Entra Id by
-creating an App registration.
+creating an App registration. An App registration can be created from
+portal.azure.
 
-### Authentication Methods
+#### Authentication Methods
 
-There are two methods of authentication for an application accessing the
-Dataverse:
+Once an app registration has been created, additional configurations depend on
+the method of authentication. There are two approaches we can take:
 
-- Direct using S2S authentication
-- Delegated, acting on behalf of an interactive user
+- App only access
+- Delegated access
 
-In both cases, we need to first create application registration for the client
-in EntraId
+##### App Only Access
 
-#### Direct Authentication
+When using App only access, a client secret will need to be generated for the
+app registration. This is used to authenticate the app.
 
-To set-up direct authentication, we need to create a client secret or
-certificate. This can then be used to authenticate as the application.
+Once authenticated, the app will act as itself and, therefore, requires the
+appropriate permissions. In the context of Dataverse, we need to:
 
-When authenticating with this method, the app is acting on its own behalf.
-Accordingly, appropriate permissions will need to be set-up for the app itself.
-In the context of Dataverse, this involves:
+- Create an app user in make.powerapps for the App Registration in Azure
+- Grant necessary permissions to the App user
 
-- Registering an app user in the relevant environment/s linked to the EntraID
-app registration
-- Adding the required permissions for this user
+Note, an app user with the required permissions will need to be set-up in all
+environments that the app will be used.
 
-#### Delegated Authentication
+##### Delegated Access
 
-With delegated authentication, we do not need to set up a client secret or
-certificate. The credentials are provided by the interactive user, e.g. using
-oAuth 2.0.
+The approach is different for delegated access. In this instance, authorization
+is based on the interactive user's security roles. The App Registration needs to
+be configured specifically for this authentication method.
 
-However,
+For delegated access, authentication will happen through OAuth 2.0 flows.
+Depending on the application you may use interactive and/or non-interactive
+flows. If an interactive authentication flow is used, it will be necessary to
+configure a redirect URI on the App Registration. Entra ID will redirect the
+user to this URL after authentication along with any necessary tokens.
 
-To act on behalf of an interactive user, we need to set-up the API permissions
-on the application registration. Specifically, the user_impersonation delegated
-permission is required for Dynamics CRM.
+Regardless of the OAuth 2.0 flows used in the application, it will also be
+necessary to grant the App Registration the Dynamics Crm user_impersonation
+permission.
 
-#### Microsoft Authentication Libraries (MSAL)
+##### Microsoft Authentication Libraries (MSAL)
 
 There is a variety of platform specific Microsoft Authentication Libraries which
-support user sign-in and access to protected Web Apis. Fundamentally, these are
-OAuth 2.0 and OpenId connect libraries, the benefits of using these are that:
+support user sign-in and access to protected Web APIs. Fundamentally, these are
+OAuth 2.0 and OpenID connect libraries, the benefits of using these are that:
 
 - They abstract the protocol level details
 - They are regularly updated with security updates
 - They cache and refresh tokens automatically
-- Supports any Microsoft Identity including personal and work/school accounts
+- They support any MS Identity including personal and work/school accounts
 
-The general pattern is:
+The [Go Odata demo](./demos/web_api_go_odata_demo.md) looks at using an MSAL
+library to authenticate using both app only access and delegated access.
 
-- Try to acquire a token silently (i.e. with no user input)
-- If this fails, acquire a token by asking the user to input credentials
+### Odata Queries
 
-In OAuth, there are two client types:
+Web API is an OData 4.0 service, this offers a standardised way to query and
+work with data. This [postman demo](./demos/web_api_postman_odata_demo.md)
+demonstrates use of this api.
 
-- Confidential: Clients capable of maintaining the confidentiality of their
-credentials, e.g. a client on a secure server with restricted access
-- Public: Clients that cannot maintain confidentiality of their credentials,
-e.g. clients on a device installed by the resource owner
+#### FetchXml
 
-## ODataQueries
+The Web API also supports fetchXML; this is not part of the oData standard but
+can be used to perform more complex queries. Odata has the $apply query
+parameter which may be used to perform grouping and aggregation, however, there
+are various limitations to the Dataverse implementation of $apply:
 
-## FetchXmlQueries
+- Distinct count not supported with count column
+- Per query limits not supported
+- Grouping by parts of a date always uses UTC
+- No support for per query limits
 
-## Perform Operations with Dataverse Web API
+FetchXml is used throughout dataverse, for instance, it has already been used in
+the plug-in demo for [retrieve multiple](./demos/plug_ins_retreive_multiple.md).
+When we use advance find in a model-driven app, we can also export the query to
+XML. This can be added as the value to a fetchXml query parameter.
 
-### What we Need to Know
+Note, the fetchXml query parameter is not prefixed with a $ as it is a
+non-standard feature.
 
-- Available at an OData v4 RESTful Endpoint
-  - Use with any programming language that
-    - supports HTTP requests, and
-    - authentication with OAuth 2.0
-    - newer service, preferred generally as it is not tied to dotnet
-    - faster and lighter than Organisation Service
+#### Call Actions from the Web Api
 
-## Implement API Retry Policies
+We can run actions, e.g. custom api actions and inbuilt dataverse actions, from
+the Web Api. This is demonstrated
+[here](./demos/web_api_and_custom_actions_demo.md).
 
-### What we Need to Know
+### User Impersonation
 
-- Service Protection Limits
-  - Evaluated over 5 min rolling window
-  - Combination of requests, execution time and number of concurrent requests
-  - 429 error thrown with a retryAfterDuration parameter sent
-  - Build 429 error handling into the code
+If it is necessary to run logic for another user, then in Dataverse, the logic
+will apply all roles and object-based security based on the user being
+impersonated.
 
-- API limits
-  - Evaluated over 24 hours
-  - Based on licence
-  - Can purchase more calls
+This is achieved by providing a CallerObjectId in the message header to indicate
+that the message should run as that user. The value of the parameter will be the
+impersonated user's Entra Id which can be queried using the MS Entra Graph API.
+
+There are system tables used to track this behaviour, for instance createdby
+and createdonbehalf columns.
+
+This is demonstrated [here](./demos/web_api_user_impersonation_demo.md)
+
+### Change Tracking
+
+Change tracking can be used to efficiently synchronise data across different
+systems. Dataverse includes a change tracking feature to help in this scenario.
+To use change tracking, it must be enabled for the table it its advanced
+settings.
+
+#### Delta Links
+
+Delta links are generated by the service and can be used to access subsequent
+changes to a result. After a change tracking request is mad a delta link will be
+returned with the response.
+
+This link, if passed with subsequent requests, will only return changes that
+have occurred since the initial request.
+
+#### Change Tracking with Web API
+
+To track changes using the Web API, add odata.track-changes to the Prefer
+header. This will add a delta link to the response. Note that use of orderby is
+not supported when odata.track-changes is used.
+
+The use of change tracking is demonstrated
+[here](./demos/web_api_change_tracking.md)
 
 ## Optimise for Performance, Concurrency, Transactions and Bulk Operations
 
-### What we Need to Know
+This is a more general section with information relevant to both Organisation
+Service and Web API.
 
-- Concurrency
-  - Set concurrency behaviors
-- Transactions
-  - Handle up to 1000 requests in a transaction with roll back if one fails
-- Bulk Operations
-  - The same but without rollback, we can set continue on error to false. Also
-  1,000 requests
-- Likely questions on which to use, options to set and limitations
+### Work with Concurrency
 
-## Perform Authentication by Using OAuth
+Power Apps is a multi-threaded and multi-user system. There is a need,
+therefore, to prevent race conditions. The information below relates only to:
 
-### What we Need to Know
+- UpdateRequests
+- DeleteRequests
 
-- We generally create an Application User for integrations and a user in Power
-platform for the service principle with a relevant security role
-- MSAL library available for various languages
+#### Optimistic Concurrency
+
+Power Apps supports optimistic concurrency for:
+
+- All custom tables
+- All out-of-the-box tables enabled for offline sync
+
+This strategy allows processes to proceed without locks on the assumption that
+no conflicts will occur. If a conflict is detected then the operation will be
+rolled back.
+
+We can enable optimistic concurrency when using Organisation Service by setting
+the concurrency behaviour of a request to IfRowVersionMatches.
+
+```cs
+var request = new UpdateRequest(){
+    Target = updatedEntity,
+    ConcurrencyBehavior = ConcurrencyBehavior.IfRowVersionMatches,
+};
+```
+
+When using the Web Api, we can use the If-Matches header and provide the record
+version as a value. The record version can be found in the odata.etag property
+included when records are returned with the API. A demonstration can be found
+[here](./demos/web_api_optimistic_concurrency.md)
+
+#### Always Overwrite
+
+The alternative to optimistic concurrency, is alwaysOverwrite. This will
+overwrite the record regardless of the version number.
+
+#### Default
+
+The default behaviour will be always overwrite except:
+
+- Where optimistic concurrency is enabled on the table, AND
+- The source is WebService as opposed to a plug-in/custom workflow activity
+
+#### Which Should You Use?
+
+Assuming both behaviours are available, optimistic concurrency adds some
+overhead but prioritises data integrity. Always overwrite is faster but will be
+at the cost of data integrity where we do not want the latest update to always
+take precedence.
+
+### Dataverse Platform Constraints
+
+- Plug-ins timeout after 2-minutes, they should not be used for long-running
+  operations
+- Requests to SQL server also generally timeout after 2 minutes
+- Service Protection Limits
+
+Running into these constraints can indicate a problem with a plugin, series of
+plug-in or web API client
+
+#### Service Protection Limits
+
+There are a number of service protection limits:
+
+- a user cannot make more than 6000 requests within a 5-minute period
+- a user cannot make requests with a total execution time of 20 mins within a
+  5-minute period
+- A user cannot make more than 51 concurrent requests
+
+##### Service Protection Limits and Plug-Ins
+
+Service protection limits do not directly apply to plug-ins or custom workflow
+activities. Requests made by a plug-in triggered by an application will not
+count to service protection API limits. However, the computation time of these
+operations are added to the initial request and this is part of the service
+protection limits.
+
+##### Retry Policies
+
+When a user exceeds service protection limits they will receive an:
+
+- OrganizationServiceFault (Organisation Service)
+- 429 Too Many Requests error (Web Api)
+
+The OrganisationsServiceFault ErrorDetails collection will contain a Retry-After
+key. Similarly, a 429 response will include a Retry-After header.
+
+One implementation of IOrganisation Service, CrmServiceClient, will handle these
+errors automatically. This class is in the Crm.Tooling.Connector library.
+
+### Transactions and Locks
+
+The protect the integrity of the database, operations are preformed within a
+transaction. Each request will place locks on resources which will not be
+released until the transaction has been committed or aborted. For instance:
+
+- Create: Write lock against the record
+- Update: Write lock against the record
+
+Transactions can include up to 1000 operations and can be rolled back if any one
+operation within a transaction fails.
+
+#### Transactions and Plugins
+
+Whether or not a plug-in is within a transaction depends on the stage:
+
+- pre-validation: Before the transaction is started
+- pre-operation: Inside the transaction
+- post-operation (sync): Inside the transaction
+- post-operation (async): Outside the transaction
+
+A plug-in registered in the pre-validation stage will be within a transaction if
+the pipeline event was triggered by a message within an existing transaction.
+
+With async post-operation plug-ins, no transaction is created. Each message is
+acted on independently.
+
+#### Transactions and Web Service Requests
+
+With plug-ins, it is the execution context that maintains the execution context.
+External requests with web services will create a pipeline with transaction
+handling but the transaction will close once the response is returned. In this
+scenario, there are two messages that may be used to perform multiple actions
+within a single request:
+
+##### ExecuteMultiple
+
+Execute multiple is used to pass multiple independent requests. No transaction
+context is held since the requests are independent. Since the operations run
+outside the context of a transaction, there is no rollback, however, we can
+pass options to stop execution when an error is encountered.
+
+##### ExecuteTransaction
+
+Here related actions can be processed in a single transaction. This should be
+used with care as it has the potential to create blocking issues in the
+platform.
+
+#### Concurrency and Transactions
+
+When there are multiple concurrent requests, there is a higher chance of
+collisions on locks.
+
+##### Async Operations
+
+Async workflows or plug-ins are not processed serially from a queue. Multiple
+activities are processed by dataverse in parallel within a given service
+instance and across service instances. Each async service instance retrieves
+jobs in batches of around 20 depending on configuration and load.
+
+Multiple asynchronous activities from a single event are likely to be processed
+in parallel and, if they operate on the same resource, lock conflict risk is
+high.
