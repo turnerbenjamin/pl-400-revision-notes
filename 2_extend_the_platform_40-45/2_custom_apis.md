@@ -35,6 +35,11 @@ Custom APIs are an alternative to custom process actions. These may be created
 without a plug-in to pass data about an event, but generally a plugin is used to
 perform some business logic and return a result.
 
+These can be used to extend the OOTB messaging to extend the Dataverse Web Api.
+For instance, we may have some complex logic to find a customer. We can simplify
+this for callers by creating a findCustomer message which implements the logic
+and returns the results.
+
 ## Custom API Tables
 
 The metadata for custom apis is stored in the following Tables:
@@ -157,7 +162,8 @@ against the custom api message.
 
 Again, there are multiple ways to trigger a custom API message.
 
-- Use a bound action in a power automate flow
+- Use a bound or unbound action in a power automate flow depending on the
+binding type of the api
 - Trigger from a plugin
 
 ```cs
@@ -165,3 +171,6 @@ var req = new OrganizationRequest(customApiName)
 ```
 
 A demonstration of Custom APIs can be found [here](./demos/custom_api_demo.md).
+This demo demonstrates the use of custom APIs from a technical perspective but
+I am not sure it represents a good use case in that it is just a wrapper around
+an external API rather than an extension of the Dataverse API.
