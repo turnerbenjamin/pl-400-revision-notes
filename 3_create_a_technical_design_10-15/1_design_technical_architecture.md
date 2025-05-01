@@ -42,79 +42,46 @@ Teams, Power BI and Dynamics 365 applications.
 
 We can also implement logic using the low-code Power Fx language.
 
+#### Business Rules
+
+Business rules are a declarative solution which people of any experience level
+can implement. We can use these rules to:
+
+- Validate data and show error messages
+- Set and clear column values
+- Set column requirement levels
+- Set column visibility
+- Enable or disable columns
+- Create business recommendations based on business intelligence.
+
+These are demonstrated [here](./demos/business_rules.md)
+
+Business rules are useful, but there is a long list of limitations:
+
+- Actions either do not work, or do not work as expected, with canvas apps
+- Not all actions work in editable grids and business rules do not work with
+editable sub-grids at all
+- Choices (multi-select), File and Language column types not supported
+- It is not possible to access data in related tables
+- Business rules run client-side, so validation  could be bypassed, e.g. by
+using an editable grid
+- They can quickly become unwieldy with more complex logic
+
+The alternatives to business rules are:
+
+- Plugins: For data validation logic
+- Client Scripts: For display logic
+
+Note that business rules run BEFORE the onLoad event. If an exam question
+includes an interaction between client script handlers and values set by
+business rules, look out for a gotcha question based on this fact.
+
 ### Power Apps Points of Extensibility
 
-#### PCF Controls
-
-PCF controls allow us to create code components for use in both Model-Driven
-and Canvas applications. These bundle HTML, CSS, JS and other resources into a
-single package that can be imported into environments. PCF controls are covered
-in detail
-[here](../1_extend_user_experience_10_15/2_power_apps_component_framework.md)
-
-#### Client Scripting
-
-We can use client scripting to extend the functionality of model-driven apps by
-writing functions as event handlers for form events and as logic for command
-button functions. We can also call client scripts from custom HTML web
-resources.
-
-Microsoft recommend that client scripts are developed in TS and compiled to JS.
-
-Client scripting is covered in detail
-[here](../1_extend_user_experience_10_15/1_client_scripting.md)
-
-#### Custom Connectors
-
-We can create custom connectors using a wizard or by importing an open API
-definition, e.g. from Azure API Management or Postman. Use these if existing
-connectors do not have the required capabilities. Custom connectors are covered
-[here](../2_extend_the_platform_40-45/4_custom_connectors.md)
-
-#### HTML web Resources
-
-HTML web resources are the predecessor to PCF code components. These may be
-encountered in older code bases.
-
-## Power Automate
-
-Power automate allows use to automate tasks and orchestrate activities. With
-connectors, we can integrate with external services. The main points of
-extensibility are:
-
-- Using custom connectors
-- Using workflow definition functions to build complex expressions
-
-## Power BI
-
-Power BI provides interactive data visualisations. The main points of
-extensibility are:
-
-- Embedding Power BI in apps, websites and portals
-- Custom visuals using the open-source SKD
-- Using the Power BI REST Api to run automatic data refresh etc
-- Developing custom Power Query connectors
-
-## Power Pages
-
-This is used to create external-facing business websites allowing users outside
-of an organisation to sign in and interact with Dataverse. The main areas of
-extensibility are:
-
-- Custom web page templates using HTML, CSS and Liquid
-- PCF controls
-- Extending site integration with Dataverse using WebApi
-- Using VS Code and pac to enable metadata editing and CI/CD of site
-configurations
-
-## Copilot Studio Copilots
-
-Copilot studio is used to create copilot agents that can answer questions from
-customers, employees and other visitors to a website or service. The key points
-of extensibility are:
-
-- Building Bot Framework Skills
-- Extending bots with Bot Framework Composer
+- PCF Controls
+- Client Scripting
+- Custom Connectors
+- HTML web resources
 
 ## Dataverse
 
@@ -128,39 +95,14 @@ column level.
 
 ### Dataverse OOTB
 
-#### Business Rules
-
-Business rules are a declarative solution which people of any experience level
-can implement. We can use these rules to:
-
-- Validate data and show error messages
-- Set and clear column values
-- Set column requirement levels
-- Set column visibility
-- Enable or disable columns
-- Create business recommendations based on business intelligence.
-
-The last three of these are not available for Canvas Apps, but nor are scripts.
-
-A distinct feature of business rules is that table-scoped rules will
-automatically apply logic on the backend where applicable. This can provide
-consistency in the application regardless of where the application is run.
-
-Business rules have some limitations and it can be difficult to implement
-complex logic with this interface. Imperative solutions include:
-
-- Plugins
-  - For complex data validation logic
-- Client Scripts
-  - If we need to reference data in a related table
-  - Run logic on the form save event
-  - If the logic is complicated to implement with business rules
-
 #### Formula, Calculated and Roll-Up Columns
 
 These are simple and performant ways to implement logic to created columns based
 on calculations and aggregations. If any of these solutions does not meet
 requirements, then a plug-in will generally be the most suitable alternative.
+
+A demo of these capabilities can be found
+[here](./demos/calculated_formula_and_rollup_columns.md)
 
 ##### Calculated Columns
 
@@ -244,40 +186,20 @@ multiple Azure functions.
 
 ### Dataverse Points of Extensibility
 
-There are a number of points of extensibility which we can use if the OOTB
-capabilities are not sufficient.
+- Virtual Tables
+- Elastic Tables
+- Plug-Ins
+- Webhooks and service endpoints
+- Custom APIS
 
-#### Virtual Tables
+## Power Automate
 
-Virtual Tables map data from an external data source enabling integration with
-that data without replicating it. Developers can create data providers using
-code to connect to external sources
+Power automate allows use to automate tasks and orchestrate activities. With
+connectors, we can integrate with external services. The main points of
+extensibility are:
 
-#### Plug-Ins
-
-Plug-ins are used to extend the functionality of Dataverse. They run as
-server-side code. The main benefits of plug-ins are that:
-
-- They can run synchronously or asynchronously
-- Pre-operation plug-ins take place in a transaction allowing for rollback
-
-Plug-ins are covered [here](../2_extend_the_platform_40-45/1_plug_ins.md)
-
-#### Webhooks and Service Endpoints
-
-#### Custom APIS
-
-Custom APIS can be used to consolidate one or more operations into a custom API
-that can be called from code, Power Apps canvas apps and Power Automate.
-
-Custom APIs are covered [here](../2_extend_the_platform_40-45/2_custom_apis.md)
-
-## Common Data Model
-
-This is an open-sourced, standard definition of entities representing commonly
-used concepts and activities. When a dataverse application is developed, a core
-sent of entities are available, e.g. account and contact. There are additional
-industry specific models, e.g. service which contains entities like case.
+- Using custom connectors
+- Using workflow definition functions to build complex expressions
 
 ## Extending Power Platform with Azure
 
@@ -357,128 +279,331 @@ functionality of these tools can be accessed with pac.
 A demonstration, using the pac cli and Configuration Migration Tool can be found
 [here](./demos/pac_tool_demo.md)
 
-## Design Technical Architecture
+## Security
 
-### What we Need to Know
+### Authentication and Authorisation
 
-- Calculated Columns
-  - Calculated on retrieve
-  - Can use on table and columns in many to one relationship
+Authentication is controlled using Entra ID. Authorisation is controlled with
+licences, security roles and the sharing of apps and flows.
 
-- Rollup Columns
-  - Requires one-to-many relationship
-  - REcalculated every hour
-  - Max 100 per env and 10 per table
-  - Supports hierarchical relationships
+Creation of apps and flows is controlled by security roles.
 
-- Logic Apps
-  - Licenced pay-as-you-go (consumption) or part of service plan (standard)
-  - Build in Azure Portal or VS
+The ability to see and use apps is controlled by sharing:
 
-- Power Automate Cloud Flows
-  - Licenced through 365 with quota of runs per month
-  - Supports approvals and notifications
+- Canvas Apps: Share directly with user or Entra group and subject to Dataverse
+security roles
+- Model-Driven Apps: Shared via Dataverse security roles
 
-![technical architecture matrix](./demos/screens/design_technical_architecture_for_a_solution.png)
+To manage security settings in Dataverse you MUST be a system administrator.
 
-Consider both Azure
+### Business Units
 
-## Design the Authentication and Authorization Strategy
+Business units are a building block of security modelling. We can use these
+to manage users and the data that they can access. Every environment will have
+a single root business unit. We can construct a hierarchy of business units
+beneath this.
 
-### What we Need to Know
+We can assign security roles, and column level security profiles to business
+units and set row level security based on business units.
 
-- Authentication
-  - Entra ID used to access Power Platform
-  - Users can auth with Entra Id tenant credentials
-  - When accessing Azure and external systems, we need to define how we
-  authenticate against those systems (typically OAuth 2.0)
-- Authorisation
-  - Entra Id Security Groups
-  - Dataverse security roles
-  - Resource Sharing
+For each business unit, an associated team is created. We can associate this
+team with an MS security group to help manage user administration and roles
+assignment.
 
-## Assess Suitability of Out-of-the-Box Solutions
+Each record has an Owning business unit column determining which business unit
+owns the record. This defaults to the user's business unit when a record is
+created.
 
-### What do we need to know?
+#### Modernised Business Units/Matrix Organisation
 
-That we should use power platform capabilities over writing code where possible
-for instance with:
+In the traditional business unit hierarchy, users are restricted to their
+respective business units. With modernised business units, users can navigate
+and collaborate across business units.
 
-- Rollup columns
-- Calculated columns
-- Column-level security
+The term matrix organisation may be used here to contrast with the traditional
+hierarchical approach.
 
-We also need to know the limitations to understand when to use other options
-such as:
+A user may still belong to a single business unit, but they can have security
+roles from multiple business units. The user or admin, is also enabled to set
+the business unit ownership of a record.
 
-- Power Automate Flows
-- Classic Workflows
-- Plugins
+To use this feature it needs to be enabled in the environment settings in the
+feature tab. The control is Record ownership across business units. Once enabled
+there is a drop down to select the business unit when assigning security roles.
 
-### Client Scripts Vs Calculated Columns
+When a user is moved between business units, there are two helper settings:
 
-## Determine where to run Business Logic
+- DoNotRemoveRolesOnChangeBusinessUnit: Default false
+- AlwaysMoveRecordToOwnerBusinessUnit: Default is true
 
-Includes:
+### Teams
 
-- Cloud computing
-- Client-Side Processing
-- Business Rules
-- Plug-ins
-- Power Automate
+Teams are another security building block. Teams are owned by a business unit,
+however, they can include members from other business units.  There are three
+team types:
 
-## Standard, Virtual and Elastic Containers and Connectors
+- Owning teams: Can own records which gives any team member direct access to
+that record.
+- Access Teams: These are used with record sharing
+- Entra group teams: Owner teams corresponding to an Entra security or office
+group type
 
-### What we Need to Know
+### System and Application Users
 
-- Standard Tables
-  - Structured model
-  - Persistent data
-  - Using business logic
-- Virtual Table
-  - Query external data sources
-  - Enhance performance and reduce data redundancy
-  - Integrate with legacy systems
-- Elastic Tables
-  - unstructured or semi-structured data
-  - Automatic horizontal scaling
-  - High volume of read/write requests
-- Connectors
-  - Integrate cloud services
-  - Leverage APIS
-  - Enable third-party integrations
+When a system is provisioned, a collection of special system and application
+users will be created:
 
-## Assess Security Features
+- System users created for integration and support
+- Application users created for setup and configuration management
 
-### What we Need to Know
+We should NOT delete or modify these users.
 
-- Data Loss Prevention Policies
-  - Find and view
-  - Edit
-  - Delete
-  - Change default data group
-  - DLP Powershell commands
-- Business Units
-  - Root business unit
-  - Hierarchical structure
-  - Basis of Dataverse Security model
-  - Assign Users
-  - Create Teams
-- Security Roles
-  - RBAC
-  - Default user security roles
-  - Table privileges
-  - Access levels
-  - Permission settings
-  - privacy related privileges
-  - miscellaneous privileges
+We  can add additional Application users to perform back-end services. Their
+data access is managed by the security role that is assigned.
 
-Includes:
+### Security Groups
 
-- Data Loss Prevention Policies
-- Security Roles
-- Teams
-- Business Units
-- Row Sharing
+If we apply a security group to an environment, then security roles in the
+environment can only be applied to users in that group.
 
-    Determine the impact of security features of the Microsoft Power Platform including data loss prevention (DLP) policies, security roles, teams, business units, and row sharing on your business solution
+### Table/Record Ownership
+
+There are two types of record ownership:
+
+- organisation owned
+- User/Team owned
+
+This is defined when the table is created and cannot be changed.
+
+With records that are organisation owned, the only access level choices are
+whether the user can perform and operation or not. For records that are user/
+team owned, access level choices are tiered allowing for row level security.
+This is covered in more detail below.
+
+### Role-Based Access Control (RBAC)
+
+Dataverse uses a role-based security model to control access to the database
+and tables in an environment. Security roles are used to grant a set of
+permissions to users and teams.
+
+Dataverse has a common RBAC layer built in at the datasource. Every request is
+made in the context of a person and only data they are allowed to see will be
+returned.
+
+Security roles are used to group a collection of privileges. These roles can be
+assigned to users, teams and business units. Privilege grands are accumulative
+with the greatest access prevailing. Role assignments should be additive, we
+could not give broad access and then use role assignments to diminish access.
+
+The process of determining access is:
+
+1. Privilege check: Does the user have the required privilege on the table
+2. Access check: Does the user have access rights to perform the action
+
+#### Access Rights
+
+There are four ways in which a user can gain access rights to perform an action
+on a given record:
+
+##### Access Rights: Ownership
+
+A user can have access to a record because they own the record or belong to a
+team that owns the record. In this instance, any access level is sufficient to
+access the record regardless of the business unit the record belongs to
+
+##### Role Access
+
+A user may have access to perform an action based on a record due to their
+security roles:
+
+- If the record belongs to the user or a team they belong to the user can access
+with the user-level access privilege
+- If the record belongs to the same business unit as the user or a team they
+belong to they will need to have a role with at least Business Unit-level access
+privilege
+- If the record belongs to a business unit that is a descendant of the business
+unit the user or a team they belong to is a member of, they will need to have a
+role with at least Parent: Child business unites access privilege
+- If the record belongs to a business unit that is not a descendant of the user/
+teams business unit then the organisation level access privilege is required.
+
+Configuring permissions on this basis allows for row-level security.
+
+The access-levels, from least to most access then are:
+
+- User
+- Business unit
+- Parent: Child business units
+- Organisation
+
+For roles assigned to teams with Basic-level access privilege, the role's
+inheritance configuration is also relevant. If the team has Member's privilege
+inheritance set to Team privileges only, they will only be able to use the
+privilege for records owned by the team. If we set this property to User
+Privileges then the user will be granted the privilege directly.
+
+##### Shared Access
+
+Individual records may be shared with a user or team. This is a useful way to
+managed exceptions to the security model. However, this should be an exception
+as it is a less performant way of controlling access.
+
+When shared, the user can access both the record and related records. But in
+both instances, they must still first pass the privilege check.
+
+A more advanced sharing concept is access teams. This provides for the
+auth-creation of a team and sharing record access with the team is based on an
+Access Team Template which is a table of permissions to be applied. This is a
+more performant method of sharing because the team does not own records and
+security roles are not assigned to the team. Access is granted because the *
+record is shared with the team and the user is a member.
+
+##### Hierarchy Access
+
+This can be used when hierarchy security management is enabled in the
+organisation and for the table if the user is a manager. The manager would have
+access to the record if:
+
+- They have a security role that has the access level Business Unit or
+Parent:Child business units, AND
+  - The record is owned by a direct report, OR
+  - A direct report is a member of the owner team, OR
+  - The record was shared to perform the required action with a direct report
+  - The record was shared to perform the required action with a team a direct
+  report belongs to
+
+#### Security Roles
+
+Security roles define access to tables in the environment. For each table we can
+specify permissions for:
+
+- Create: Create a record
+- Read: Read a record
+- Write: Update a record
+- Delete: Delete a record
+- Append: Append record to the table
+- Append To: Append record to another table
+- Assign: Used to give ownership of a record to another user
+- Share: Ability to share a record with a user or team
+
+When a record is shared we can define the access level to that shared record,
+i.e. which of the above permissions they have.
+
+We can assign roles on a user, business unit or team basis.
+
+##### Miscellaneous Privileges
+
+We can also define miscellaneous privileges in a security role, e.g.:
+
+- Act on Behalf of Another user
+- Activate Business Process Flows/Business Rules
+- Bulk edit and Bulk delete
+- Run Flows
+
+##### Pre-defined Security Roles
+
+- System Admin: Full permission to customise and administer the environment
+including creating, modifying and assigning security roles. Can view all data
+- System Customiser: Full permission to customise the environment. Can view all
+custom data in the environment but has only user level access for Account,
+Contact and Activity tables
+- Basic user: For OOTB entities only, can run an app in the environment and
+perform tasks on records they own.
+
+#### Form Security
+
+In the settings for a form, we can define the security roles required to access
+the form. This can be useful to show different UIs for a form, but it will not
+secure the underlying data. To control access to fields use column-level
+security.
+
+##### Column Level Security
+
+We can use column security to control access to a given column. We can enable
+column level security for a given column in a table. Once enabled it will only
+be accessible to those with permissions through a column security profile.
+
+We can create a column security profile in an environment and add the column and
+the level of access.
+
+We can add users, teams and business units to the profile.
+
+The permissions we can configure for a column security profile are:
+
+- Read (allowed/not allowed)
+- Read unmask (all records, one record, not allowed)
+- update (allowed/not allowed)
+- create (allowed/not allowed)
+
+Some columns cannot be secured this way:
+
+- Virtual table columns
+- Lookup columns
+- Formula columns
+- Primary name columns
+- System columns
+
+##### Column-Level Security: Calculated columns
+
+When a calculated column included a secured column, access to data may be given
+unintentionally, so both should be secured.
+
+Similarly, composite columns inherit data from multiple columns, to secure this
+we would need to secure all columns that belong to it.
+
+###### Column-Level Security: Masking Rules
+
+Masking rules can be used to hide sensitive information, we can created masking
+rules in a solution. We use a regexp to define the masking rule and a character
+to be used for the masking.
+
+When a column is enabled for column security we can add a masking rule to be
+applied to the column.
+
+These can only be used for text and number fields.
+
+Note, if the permission for masking is set to one record then the user can read
+masked values but must retrieve the unmasked values one record at a time.
+
+#### Security and Solutions
+
+We can add security roles and column security profiles to solutions. This
+enables the transport of these entities across environments.
+
+## Data Loss Prevention Policies
+
+Data Loss Prevention is an important aspect of data security and compliance. We
+can create policies to reduce the risk of users unintentionally exposing
+organisational data.
+
+Policies can be defined at either a tenant or environment level, we need the
+Power Platform Administrator/System Administrator roles respectively to work
+with these policies. The scopes are:
+
+- Add all environments
+- Excluded certain environments (all but those excluded)
+- Add multiple environments
+
+The policy defines, for prebuilt and custom connectors, whether each connector
+is:
+
+- Business
+- Non-Business
+- Blocked
+
+By default, all connectors are non-business. We can change the default group
+when defining a policy.
+
+Blocked policies cannot be used and business connectors cannot be used in the
+same flow/app with non-business connectors.
+
+Some connectors are not blockable, this includes, Teams, Excel, SharePoint,
+OneDrive, PowerBi and Outlook. It includes most MS enterprise standard
+connectors and the dataverse connectors.
+
+If an app or flow violates an active DLP then the maker will be unable to save
+the app/flow. If a policy is activated which causes a previously saved app or
+flow to be in violation of the policy, the app/flow will not run.
+
+I can't find confirmation, but I understand that we can have multiple policies
+and if any of these are violated the app/flow will not work.
