@@ -124,6 +124,7 @@ interface.
 Azure Service Bus should be used when:
 
 - High-scale async processing/queuing is required
+- Decouples applications and protects from temporary peak
 - Multiple subscribers may need to consume an event
 
 Webhooks should be used when:

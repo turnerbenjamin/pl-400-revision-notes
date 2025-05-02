@@ -213,7 +213,23 @@ Custom Connectors to integrate Dataverse with these functions. For Azure
 functions with a HTTP trigger we can integrate using:
 
 - Custom connectors
+- Webhooks
 - Calling the endpoint in code, e.g. a plug-in or client script
+
+#### Azure Functions vs Plugins
+
+We should use Azure functions for:
+
+- Complex or compute intensive tasks to reduce the load on the Dataverse's
+application host
+- Tight integration with Azure Services
+- Execution may take longer than 2 minutes
+
+We should use plugins when:
+
+- Data needs to be updated in the most performant manner
+- Tight integration with Dataverse and full rollback support
+- The logic can execute within 2 minutes
 
 ### API Management (APIM)
 
@@ -245,6 +261,21 @@ with Power Apps and Dataverse.
 We can use Logic Apps to compliment Power Automate where Power Automate does not
 meet requirements, for example, to use the Enterprise integration pack or SOAP
 connectors.
+
+#### Logic Apps vs Power Apps
+
+We should use logic apps where:
+
+- Performance is critical
+- Easier integration with Azure monitoring tools
+- Better error handling
+- Http trigger
+
+We should use Power Automate when:
+
+- We need a more capable Dataverse Connector
+- Flow should be packaged in a solution
+- We want to use the Approvals and Send Notifications connector
 
 ### AI Services
 
