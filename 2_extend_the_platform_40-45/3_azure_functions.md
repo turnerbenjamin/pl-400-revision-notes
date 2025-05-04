@@ -176,7 +176,7 @@ send it to be processed.
 
 ## Authenticate to Power Platform with Identity-Based Connection
 
-With some connections we will need to use tokens and secrets to authenticate.
+With some connections, we will need to use tokens and secrets to authenticate.
 With Azure functions, we can use the application settings to securely store
 these credentials. They will be encrypted and accessed by the app at runtime
 as environment variables. For local development these credentials can be stored
@@ -190,14 +190,15 @@ principle. Finally we can grant the app user the necessary permissions.
 
 This process is demonstrated in a
 [demo](./demos/web_api_go_odata_demo.md)
-for the platform APIS document in the context of an external console
+for the platform APIs document in the context of an external console
 application.
 
 With Azure functions we can also use managed identities. When we create a
-managed identity for a function app an application registration is created which
-we can use as described in the platform API demo. The main difference here is
-that azure will manage the certificates and secrets for the app registration on
-our behalf so we do not need to keep renewing these manually when they expire.
+managed identity for a function app, an application registration is created
+which we can use as described in the platform API demo. The main difference here
+is that azure will manage the certificates and secrets for the app registration
+on our behalf so we do not need to keep renewing these manually when they
+expire.
 
 ## Demonstrations
 

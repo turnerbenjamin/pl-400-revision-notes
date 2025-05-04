@@ -9,19 +9,19 @@ and the data structures it receives/returns so that Power Platform may
 communicate with that service.
 
 There is a substantial library of prebuilt connectors, however, if these do not
-include the service or functionality we require then a custom creator may be
+include the service or functionality we require then a custom connector may be
 created. Once created we can use the connector in:
 
 - Power Automate
 - Power Apps
-- Logic Apps
+- Azure Logic Apps
 - Copilot Studio
 
 We can build a connector without writing a single line of code, however there
 are advanced features of connectors that may require the API to have supporting
 capabilities. We may also need to interact with the OpenAPI definition directly
-writing JSON or YAML, as some advanced features cannot be customised through the
-custom API designer.
+by writing JSON or YAML, as some advanced features cannot be customised through
+the custom API designer.
 
 ## Creating a Connector
 
@@ -50,6 +50,9 @@ two broad categories:
 1. Display information: Icon, icon background colour and description
 2. Root connection info: Connect via on-premises gateway, http/s, host and base
 url
+
+We can use environment variables when defining this information, e.g. we may
+set host to @environmentVariables("cr950_customConnectorHost")
 
 ### Creating a Connector: Security Tab
 
@@ -94,7 +97,7 @@ value.
 There is then a request and response section, these allow us to import from a
 sample.
 
-##### Triggers
+#### Triggers
 
 Triggers allow us to trigger a workflow when an event occurs in an external
 service, for example, when a row is added in the Dataverse.
@@ -109,7 +112,7 @@ instance, with webhooks, the API will need to provide an endpoint that will
 receive and store callback urls which may then be used to inform Power Platform
 when a relevant event has occurred.
 
-##### Policies
+#### Policies
 
 Policies can be used to modify behaviour at runtime, for example based on the
 language of the user.
@@ -120,7 +123,7 @@ order of execution.
 
 Each policy can apply to one or more operations.
 
-###### Expressions
+##### Expressions
 
 Policies use expressions to specify where data is accessed from. Expressions are
 prefixed with an @ symbol.
@@ -134,7 +137,7 @@ automatically
 @body().invoices[0].invoiceId               //dot and bracket notation
 ```
 
-###### DataSources
+###### Expression DataSources
 
 - headers
 - body()
