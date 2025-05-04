@@ -178,13 +178,13 @@ send it to be processed.
 
 With some connections we will need to use tokens and secrets to authenticate.
 With Azure functions, we can use the application settings to securely store
-these credentials. They will be encrypted and accessed by the app as runtime
+these credentials. They will be encrypted and accessed by the app at runtime
 as environment variables. For local development these credentials can be stored
 in local.settings.json and added to .gitignore.
 
 With some connections, including to Power Platform with the Web API, we can
 authenticate with an Entra ID identity rather than use secrets. The process is
-simple, we can create an app registration, to create a service principle. We can
+simple, we can create an app registration to act as a service principle. We can
 then create an App User in the Power Platform environment linked to the service
 principle. Finally we can grant the app user the necessary permissions.
 
