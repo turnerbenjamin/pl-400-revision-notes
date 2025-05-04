@@ -117,7 +117,7 @@ when a relevant event has occurred.
 Policies can be used to modify behaviour at runtime, for example based on the
 language of the user.
 
-We can create polities from the definition tab or using the paconn cli. A given
+We can create policies from the definition tab or using the paconn cli. A given
 connector can have multiple policies, and they may be ordered to control the
 order of execution.
 
@@ -146,13 +146,7 @@ automatically
 values
 - {paramName}: Action parameters
 
-###### Connection Parameters
-
-When we set up a connector, an apiProperties.json file is generated with the
-connection parameters, for instance, an API key parameter. We can manually edit
-this file to add additional parameters which may be used in the policies.
-
-###### Templates
+##### Policy Templates
 
 - Set header
 - Set query parameter
@@ -377,6 +371,12 @@ x-ms-dynamic-properties:
 
 So we pass the operation used to get the schema and we can also pass parameters
 to the operation.
+
+### Connection Parameters
+
+When we set up a connector, an apiProperties.json file is generated with the
+connection parameters, for instance, an API key parameter. We can manually edit
+this file to add additional parameters which may be used in the policies.
 
 ## Sharing Connectors
 
