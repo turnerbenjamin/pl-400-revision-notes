@@ -176,26 +176,27 @@ send it to be processed.
 
 ## Authenticate to Power Platform with Identity-Based Connection
 
-Azure functions use the applications settings functionality of Azure App Service
-to securely store secrets and tokens when connecting to other services. App
-Settings in Azure are stored encrypted and accessed at runtime by the app as
-environment variables.
+With some connections we will need to use tokens and secrets to authenticate.
+With Azure functions, we can use the application settings to securely store
+these credentials. They will be encrypted and accessed by the app and runtime
+as environment variables.
 
-Some connections are configured to use an identity instead of a secret. Support
-for this depends on the extension using the connection.
+With some connections, including to Power Platform with the Web API, we can
+authenticate with an Entra ID identity rather than use secrets. The process is
+simple, we can create an app registration, to create a service principle. We can
+then create an App User in the Power Platform environment linked to the service
+principle. Finally we can grant the app user the necessary permissions.
 
-The process is simple, we can create an app registration, or used a managed
-identity, to create a service principle. We can create an App User in the
-Power Platform environment linked to the service principle. We can then grant
-the app user the necessary permissions.
+This process is demonstrated in a
+[demo](./demos/web_api_go_odata_demo.md)
+for the platform APIS document in the context of an external console
+application.
 
-The process is demonstrated in the platform APIs document in the context of an
-external console application. The only difference with Azure Functions is that
-we also have the option to use a managed identity, this will create an App
-Registration but also manage certificates and secrets so we do not have to
-manually renew these.
-
-[platform API demo](./demos/web_api_go_odata_demo.md)
+With Azure functions we can also use managed identities. When we create a
+managed identity for a function app an application registration is created which
+we can use as described in the platform API demo. The main difference here is
+that azure will manage the certificates and secrets for the app registration on
+our behalf so we do not need to keep renewing these manually when they expire.
 
 ## Demonstrations
 
