@@ -146,6 +146,10 @@ automatically
 values
 - {paramName}: Action parameters
 
+When we set up a connector, an apiProperties.json file is generated with the
+connection parameters, for instance, an API key parameter. We can manually edit
+this file to add additional parameters which may be used in the policies.
+
 ##### Policy Templates
 
 - Set header
@@ -199,7 +203,7 @@ Custom connectors use OpenAPI (AKA Swagger) definitions to describe auth,
 actions, triggers and parameters.
 
 MS has defined a variety of extensions to the OpenAPI definition, which can be
-identified by the x-ms-prefix. Many of the extensions can be applied through
+identified by the x-ms prefix. Many of the extensions can be applied through
 the connection designer, for instance x-ms-visibility and x-ms-summary for
 actions. Other extensions can only be specified using the Swagger editor.
 
@@ -214,8 +218,8 @@ environment
 - The swagger editor may be used in the connector designer, this is generally
 the fastest method to add extensions
 
-Note, the swagger editor uses YAML. If we use a CLI table then data is
-downloaded and uploaded in JSON.
+Note, the swagger editor uses YAML. If we use a CLI data is downloaded and
+uploaded in JSON.
 
 ### Specific Microsoft Extensions
 
@@ -372,12 +376,6 @@ x-ms-dynamic-properties:
 So we pass the operation used to get the schema and we can also pass parameters
 to the operation.
 
-### Connection Parameters
-
-When we set up a connector, an apiProperties.json file is generated with the
-connection parameters, for instance, an API key parameter. We can manually edit
-this file to add additional parameters which may be used in the policies.
-
 ## Sharing Connectors
 
 Once created in an environment, connectors can be exported and imported into
@@ -396,8 +394,7 @@ added to a solution. The reference is pointer to a connection outside the
 solution.
 
 Note, by default, custom connectors are not available to other users within the
-same environment. They must be shared to make them available to other users. If
-the connector is within a solution access then there is no need to share.
+same environment. They must be shared to make them available to other users.
 Role-based security is used here and availability depends on the user's access
 to the Connector and Connection Reference tables.
 

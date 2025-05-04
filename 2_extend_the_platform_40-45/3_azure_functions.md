@@ -213,3 +213,6 @@ The custom connectors demo, covered in the next document, contains:
 - Standard and durable functions
 - HTTP and service bus queue triggers
 - Use of SQL bindings
+
+There is a write-up to explain the creation of this Azure Function App and a few
+of its methods [here](./demos/azure_functions_demo.md)
