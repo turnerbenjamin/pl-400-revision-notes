@@ -26,6 +26,7 @@ because:
 - As with other workflows they can be disabled in the UI
 - It is less intuitive to prevent developers from registering synchronous steps
 against the message
+- We cannot define execute privileges
 
 Instead, we should use:
 
@@ -58,7 +59,7 @@ There are various ways to create a custom API:
 
 Note, the custom API and any input/output parameters will be customisable by
 default. It is recommended that we change this to false so that it cannot be
-modified when exported as a managed solution. Find the Api and parameters in the
+modified when exported as a managed solution. Find the API and parameters in the
 solution, select the ... menu and edit the managed properties.
 
 ## Creating a Custom API with PRT
@@ -146,8 +147,8 @@ the execution context.
 We can attach business logic to a custom API by:
 
 - Attaching a plug-in to the custom API
-- Registering a plugin step against the custom API message
-- Listening for the message with a Power Automate Flow
+- Registering a plugin step against the custom API message (if enabled)
+- Listening for the message with a Power Automate Flow (actions only)
 
 Generally, a plug-in is attached to the custom API. However note that:
 
@@ -163,8 +164,9 @@ against the custom api message.
 Again, there are multiple ways to trigger a custom API message.
 
 - Use a bound or unbound action in a power automate flow depending on the
-binding type of the api
+binding type of the API
 - Trigger from a plugin
+- Trigger from WebApi
 
 ```cs
 var req = new OrganizationRequest(customApiName)

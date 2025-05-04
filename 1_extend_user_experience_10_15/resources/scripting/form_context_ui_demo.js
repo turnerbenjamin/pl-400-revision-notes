@@ -65,6 +65,7 @@ this.cr950.formContextUiDemoFunctions = (function () {
       logicalNames.primaryContact,
       primaryContactOnChangeHandler
     );
+
     const notificationMessage = "All handlers added";
     formContext.ui.setFormNotification(
       notificationMessage,

@@ -2,7 +2,7 @@
 
 ## Registration
 
-The custom api was registered using PRT.
+The custom API was registered using PRT.
 
 ![registration](./screens/capi_create_custom_api_in_prt.png)
 
@@ -71,3 +71,20 @@ We can also use Power Automate to trigger the custom API:
 ![Trigger flow](./screens/capi_invocation_with_flow.png)
 
 ![Trigger result](./screens/capi_notification_screenshot.png)
+
+### Trigger with WebApi
+
+If integrating with an external service, we can use web api to trigger a custom
+API. Using Postman:
+
+First, fetch all contacts, chose on and copy the guid:
+
+![get all contacts](./screens/capi_pm_get_all_contacts.png)
+
+Next, I have updated the country field for the contact to Hungary:
+
+![set country](./screens/capi_pm_view_contact.png)
+
+Finally, we can trigger the custom API using the WebAPI:
+
+![trigger](./screens/capi_pm_trigger_endpoint.png)

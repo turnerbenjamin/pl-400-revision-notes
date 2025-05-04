@@ -21,9 +21,9 @@ There are two component types we can create:
 - [Creator Kit](https://github.com/microsoft/powercat-creator-kit/)
 - [PCF Gallery](https://pcf.gallery/)
 
-The creator kit contains a collection of commonly used pcf controls. There are
+The creator kit contains a collection of commonly used PCF controls. There are
 also templates and utilities to help productivity. All components use the Fluent
-Ui framework.
+UI framework.
 
 PCF Gallery contains components created by the community.
 
@@ -32,7 +32,7 @@ PCF Gallery contains components created by the community.
 In the relevant directory, type:
 
 ```terminal
-pac pcf init --namespace NAMESPACE --name COMPONENT_NAME --template FIELD/DATASET
+pac pcf init --namespace NAMESPACE --name COMPONENT_NAME --template FIELD | DATASET
 ```
 
 We can use -ns, -n and -t flags here.
@@ -230,7 +230,7 @@ create an infinite loop.
 
 This function is called by Power Apps after a call to notifyOutputChange. It is
 used to pass the updated internal state of the component to Power Apps. If new
-state is passed to Power Apps then it will call update view to update the UI.
+state is passed to Power Apps, it will call update view to update the UI.
 
 ### Destroy
 
@@ -251,14 +251,32 @@ ReactDom.unmountComponentAtNode inside the destroy method.
 
 ### Package Component
 
-To package a component we can use the msbuild tool. This is accessible through
-the dotnet cli:
+To package a component we can:
+
+First, initialise a package:
+
+```terminal
+pac solution init --publisher-name YOUR_PUB_NAME --publisher-prefix YOUR_PUB_PREFIX
+```
+
+Next, add the PCF component to the package:
+
+```terminal
+pac solution add-reference --path PATH_TO_PCF_CONTROL
+```
+
+Finally, build the package as a zip file that can be then be imported into an
+environment:
 
 ```terminal
 dotnet msbuild -t:build --restore
 ```
 
 We only need to run --restore the first time that this command is run.
+
+We can import this solution manually or using pac. The use of solution packager
+is covered in more detail
+[here](../3_create_a_technical_design_10-15/demos/pac_tool_demo.md)
 
 This command will package the component as a solution which we can then import
 into our environment. We could do this manually or using pac.
@@ -291,11 +309,8 @@ To upload the file we run:
 pac pcf push --publisher-prefix <some prefix>
 ```
 
-Note, I am not sure we need to use msbuild. At least after the first time this
-has been run with the restore flag. The pac logs indicate that this is called
-when running push.
-
-To update the component we just need to rerun this push command.
+To update the component we just need to rerun this push command. Note, that the
+component version must be updated else the environment will skip the import.
 
 ### Consume
 

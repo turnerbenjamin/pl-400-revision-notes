@@ -119,7 +119,7 @@ this.cr950.xrmNavigationAndPanelDemo = (function () {
     }
   }
 
-  /** Note, if we with to open a form as a dialog we should use navigate to
+  /** Note, if we wish to open a form as a dialog we should use navigate to
    * instead
    */
   function openFormDemo() {

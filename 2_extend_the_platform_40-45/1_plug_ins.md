@@ -133,10 +133,10 @@ entity in the execution context. This improves performance; without images we
 would need to make an API call with the Organisation Service to get that data.
 
 These can be defined with the PRT tool. Register an image for the step, define
-the parameters to include and provide an identifier so that the image may be
-accessed in code. Be aware that by default all parameters are included. Given
-that a key benefit of pre/post images is performance, we should always define
-the minimum set of parameters required for the functionality.
+the parameters and provide an identifier so that the image may be accessed in
+code. Be aware that by default all parameters are included. Given that a key
+benefit of pre/post images is performance, we should always define the minimum
+set of parameters required for the functionality.
 
 ```cs
 context.PostEntityImages[imageIdentifier]

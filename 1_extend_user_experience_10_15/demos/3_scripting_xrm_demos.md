@@ -50,8 +50,8 @@ Xrm.Device.openFile to open the file which will download it.
 ### Open Form
 
 This demo simply opens a form for the account table. The openInNewWindow
-property is set to true in the options object. This simply opens a create
-account form in a new tab.
+property is set to true in the options object. This opens a create account form
+in a new tab.
 
 ### Open Url
 

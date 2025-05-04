@@ -2,9 +2,10 @@
 
 ## Introduction
 
-Azure Function Apps can be used to generate serverless applications. Azure
-Functions supports a variety of triggers bindings. We can use a variety of
-runtimes when defining a function app including:
+Power Platform can integrate natively with a variety of Azure Services. One of
+these services is Azure Function Apps. We can use this service to generate
+serverless functions. Azure Functions supports a variety of triggers and
+bindings. We can also select from a range of runtimes including:
 
 - .Net
 - Node.js
@@ -19,7 +20,7 @@ with a single trigger. Many triggers will have associated data which will
 generally be available as the payload of the function:
 
 - Timer: Runs on a schedule defined with a Cron Expression
-- Queue Storage: Runs when a message added to specified storage queue
+- Queue Storage: Runs when a message is added to specified storage queue
 - Service Bus Queue: Ditto but with a service bus queue
 - Bus Topic Queue: Runs when a message is added to a specified Service Bus Topic
 queue
@@ -44,6 +45,44 @@ every month on any day of the week.
 "n-n" specifies a range
 "n,n,n" specifies a list
 
+## Building an Azure Function
+
+The first step is to create a function app in Azure Portal. Once the app has
+been created we can develop the code locally. If using VS Code, it is useful to
+install the following extensions:
+
+- Azure Functions
+- Azure Tools
+- C# Extension
+
+Once the extensions have been installed, search the command palette for Install
+or Update Azure Functions Core Tools.
+
+### Scaffolding the Function Project
+
+Search the command palette for Create New Project and work through the wizard.
+We will need to select the directory, runtime and template for the project. If
+using a .NET runtime, select an isolated runtime; support for the in process
+model is ending.
+
+Once the project has been scaffolded, it will include two json files:
+
+- host.json: Allows us to configure the host
+- local.settings.json: Allows us to configure things like secrets for local
+development
+
+### Running the Function Project
+
+To run the function we can use the func start command. This is a simple process
+for the HTTP and Webhook triggers. However, for other triggers we will need some
+additional set-up, e.g. setting up Values.AzureWebJobsStorage key to a valid
+Azure storage account connection string.
+
+### Publishing the Function Project
+
+We can publish the function using the command palette; search for the Deploy to
+Function App command and follow the wizard.
+
 ## Process Long-Running Operations with Azure Functions
 
 Azure functions can be used for long-running operations:
@@ -51,7 +90,7 @@ Azure functions can be used for long-running operations:
 - 5-10 minutes: Consumption plan
 - 30-unlimited: Premium plan
 
-This stands in contrast to Powerplatform Plug-ins which will timeout after 2
+This stands in contrast to Power Platform Plug-ins which will timeout after 2
 minutes.
 
 ### Durable Functions
@@ -68,7 +107,7 @@ As a general rule:
 - Functions SHOULD not call other functions
 - Functions SHOULD have a single responsibility
 
-Without the Durable Functions Extension, we may the following process:
+Without the Durable Functions Extension, we may implement the following process:
 
 - F1 is triggered and runs
 - F1 stores a result in storage or a queue
@@ -77,7 +116,7 @@ Without the Durable Functions Extension, we may the following process:
 Such a process can meet the three rules above, but the workflow may be difficult
 to understand. Durable Functions, essentially allow us to define these workflows
 in code. Behind the scenes, there will still be queues and table storage, but
-Azure Durable Functions will handle all of this behind the scenes.
+Azure Durable Functions will handle this for us.
 
 The extension also contains a toolbox to help with common tasks like timers and
 retries.
@@ -148,10 +187,15 @@ for this depends on the extension using the connection.
 Note that the identities must have the required permissions to perform actions
 this is done using RBAC.
 
-## Authenticate to Power Platform with Managed Identities
+## Demonstrations
 
-### What we Need to Know
+I have not created any specific demonstrations of Azure functions in this
+document, however, they are used to demonstrate other concepts:
 
-- We can use App registrations
-- We can create managed identities in Azure
-  - Uses client ids and secrets
+- [custom connectors](./demos/custom_connectors_arcade_scores_demo.md)
+- [webhooks](../6_develop_integrations_5-10/demos/webhook_demo.md)
+
+The custom connectors demo, covered in the next document, contains:
+
+- Standard and durable functions
+- HTTP and service bus queue triggers

@@ -29,8 +29,12 @@ The demonstration code uses a more long-winded approach to handle errors.
 
 ### Before
 
+Contact pre-update:
+
 ![before execution](./screens/pi_params_before.png)
 
 ### After
+
+Contact after updating the first name to Orville and saving the record.
 
 ![after execution](./screens/pi_params_after.png)

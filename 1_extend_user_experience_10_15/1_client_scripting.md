@@ -20,7 +20,7 @@ in forms and command bars.
 
 ## The Client API Object Model
 
-### What is the Client API Object Model
+### What is the Client API Object Model?
 
 Client-side scripts should not interact directly with the DOM. Instead, they
 should implement logic by interacting with the Client API model. This model
@@ -36,7 +36,7 @@ includes 4 root objects:
 Client-side web resources may be used as event handlers in MDA forms. In this
 context, the execution is event driven, for instance, a handler may be
 registered against an onLoad, onChange or onSave event. When a JS web resource
-is registered against an event in a MDA form, we may pass the execution context
+is registered against an event in an MDA form, we can pass the execution context
 as the first argument.
 
 The execution context defines the event context in which the handler executes.
@@ -67,9 +67,9 @@ const formContext = executionContext.getFormContext();
 
 This object contains various methods that can be used to work with the form
 data. For instance, we can access and set the value of fields on the form, check
-for the form status for dirty or invalid data and save the form. It is also
-possible to interact with a business process where available, e.g. getting and
-setting process stages and steps.
+the form status for dirty or invalid data and save the form. It is also possible
+to interact with a business process where available, e.g. getting anD setting
+process stages and steps.
 
 This object is demonstrated
 [here](./demos/1_scripting_form_context_data_demo.md).
@@ -125,7 +125,7 @@ using:
 #### XRM
 
 The Xrm object is globally available in the code without need for the execution
-context. It contains methods a variety of APIS:
+context. It contains a variety of APIs:
 
 ##### Xrm.App
 
@@ -145,7 +145,7 @@ This contains methods to encode strings to and from html/xml
 ##### Xrm.Navigation
 
 The navigation object contains methods to navigate to forms, files and urls.
-Also includes methods to open dialogues boxes.
+Also includes methods to open dialogue boxes.
 
 ##### Xrm.Panel
 
@@ -164,8 +164,8 @@ Web API actions and functions
 
 ##### Xrm Demo
 
-A demonstrations focussed on the Navigation, Panel, App and WebApi methods can
-be found [here](./demos/3_scripting_xrm_demos.md).
+A demonstration focussed on the Navigation, Panel, App and WebApi methods can be
+found [here](./demos/3_scripting_xrm_demos.md).
 
 ## Managing Dependencies
 
@@ -322,6 +322,10 @@ web resource with content from a local file rather that uploading and
 republishing each time.
 
 ### Monitor
+
+Monitor can be used to debug both canvas and model-driven apps. This is covered
+in detail
+[here](../5_implement_power_apps_improvements_10-15/2_optimise_and_troubleshoot_apps.md)
 
 ## Best Practices
 

@@ -223,7 +223,7 @@ export class deviceDemo implements ComponentFramework.StandardControl<IInputs, I
             maximumAllowedFileSize: 1024 * 1024 * 10
         });
         if(!files?.length) return "";
-        return  this.getFileUrl(files[0], BaseMimeType.Audio);
+        return  this.getFileUrl(files[0], BaseMimeType.Unknown);
     }
 
     
