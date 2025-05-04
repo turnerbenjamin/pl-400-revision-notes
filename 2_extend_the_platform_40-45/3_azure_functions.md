@@ -184,8 +184,18 @@ environment variables.
 Some connections are configured to use an identity instead of a secret. Support
 for this depends on the extension using the connection.
 
-Note that the identities must have the required permissions to perform actions
-this is done using RBAC.
+The process is simple, we can create an app registration, or used a managed
+identity, to create a service principle. We can create an App User in the
+Power Platform environment linked to the service principle. We can then grant
+the app user the necessary permissions.
+
+The process is demonstrated in the platform APIs document in the context of an
+external console application. The only difference with Azure Functions is that
+we also have the option to use a managed identity, this will create an App
+Registration but also manage certificates and secrets so we do not have to
+manually renew these.
+
+[platform API demo](./demos/web_api_go_odata_demo.md)
 
 ## Demonstrations
 
@@ -199,3 +209,4 @@ The custom connectors demo, covered in the next document, contains:
 
 - Standard and durable functions
 - HTTP and service bus queue triggers
+- Use of SQL bindings
