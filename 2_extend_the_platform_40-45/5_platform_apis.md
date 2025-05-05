@@ -28,9 +28,8 @@ resource can be controlled with RBAC. So, there is a separation of concerns:
 - OAuth: Authentication
 - RBAC: Authorisation
 
-To authenticate an application, the app must be registered with Entra Id by
-creating an App registration. An App registration can be created from
-portal.azure.
+To authenticate an application, the app should be registered with Entra ID by
+creating an App registration in Azure.
 
 #### Authentication Methods
 

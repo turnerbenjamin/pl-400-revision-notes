@@ -184,6 +184,42 @@ solution that requires a base solution that is not installed, then you will not
 be able to install the solution until the base is installed. Conversely, the
 base solution cannot be deleted while a solution depends on it.
 
+### Solution Component Dependencies
+
+The solutions framework will automatically track dependencies for solution
+components. To maintain the integrity of the system:
+
+- A component cannot be deleted while another components depends on it
+- There will be a warning if the solution contains any missing components that
+may cause a failure on import if the dependencies are missing in the target
+environment.
+
+There are three types of component dependency:
+
+- Solution internal: Internal dependencies are those managed by Dataverse. They
+exist when a component cannot exist without another
+- Published: These are created when two solution components are related to each
+other and then published. To remove this dependency, the association must be
+removed and the tables republished
+- Unpublished: These apply to the unpublished version of a publishable solution
+component that is being updated. One published it will be a published dependency
+
+Internal dependencies may lead to published dependencies. For example, columns
+in a table are dependent on the table. If a table is deleted then all columns
+will be deleted to along with any relationships. If we have a lookup field on
+a table form and then delete the primary table in the relationship, the deletion
+can not be completed until the lookup column has been removed from the related
+form and the form has been published.
+
+### Solutions and Environment Variables
+
+We can add an environment variable to a solution with a name, description and
+data type. We can also provide a default and a current value. The current value
+will override the default in the environment.
+
+This can be useful in ALM as we can use a variable, e.g. as the host for a
+connector and override this value as necessary in different environments.
+
 ### Solution Segmentation
 
 Segmentation allows for granular development. Here, we would avoid selecting the
