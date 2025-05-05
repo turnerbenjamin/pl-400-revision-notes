@@ -30,8 +30,7 @@ Two things to note:
 
 - First, again, the logic runs every time Player is updated, there is no need to
 save the form to see the updates
-- Second, we cannot related entity fields, e.g. reading the name field of the
-Player. We can only check for reference equality here
+- Second, we cannot access data in related entity fields
 
 ![set and clear def](./screens/br/3_set_clear_field.png)
 

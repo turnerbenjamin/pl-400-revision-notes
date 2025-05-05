@@ -40,7 +40,7 @@ Auditing can be configured at three levels:
 - Column
 
 First, we must turn on auditing at the environment level. To log changes in a
-table auditing must be turned on the table and the column.
+table auditing must be turned on at both the table and the column level.
 
 To enable user access auditing or activity logging, we must enable these at the
 environment level. We can also enable auditing for security roles.
@@ -62,8 +62,6 @@ activities.
 Power Apps, Power Automate, Connectors, Data Loss Prevention and Power Platform
 administrative activity logging are tracked and viewed from the Microsoft
 Purview compliance portal.
-
-### Location of Errors
 
 ## Configure Dataverse Security Roles to support Code Components
 

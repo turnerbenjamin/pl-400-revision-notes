@@ -90,8 +90,8 @@ confident that the values apply only to that single column in that table.
 
 ### Choice Values
 
-When data for a choice only the numeric value (single option) or comma separated
-numeric options (multiple options) is stored.
+With choices, only the numeric value (single option) or comma separated numeric
+options (multiple options) is stored.
 
 ### Choice Vs Lookup
 
@@ -110,7 +110,7 @@ lookups are treated as reference data
 formulas. With Tables, additional columns may be added
 - Choices have localisation built-in whereas we must handle this ourselves with
 lookups
-- With choices there is no build-in support of dependent choice columns. With
+- With choices there is no built-in support of dependent choice columns. With
 lookups it is easy to model and implement dependent columns
 
 Once a column has been created the data type cannot be changed. So we should be
@@ -263,32 +263,3 @@ functions.
 ### Delegation Warnings
 
 If a function is not delegable, a warning will be shown to indicate this.
-
-## Implement Complex Power FX Formulas
-
-### What we Need to Know
-
-The focus is on more complex Power FX formulas:
-
-- Set values
-- Format output
-- Perform calculations
-- Control visibility and display mode of controls
-- Patch
-- Filter Data
-- Search Data
-
-## Build reusable Component Libraries
-
-### What we Need to Know
-
-- Discover and search components
-- Building components in a library
-- Updating components in a library
-
-## Use Power Automate Flows from a Canvas App
-
-### What we Need to Know
-
-- Calling flows from a canvas app
-- Storing and using data returned

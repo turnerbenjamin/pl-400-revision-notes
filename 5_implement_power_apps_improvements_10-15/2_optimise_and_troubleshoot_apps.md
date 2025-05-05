@@ -9,7 +9,6 @@ Most app performance problems are due to interactions with data sources:
 - Too many refreshes: Power Apps handles refreshes automatically with form save
 - Too many lookups: If used in a gallery label, lookup performed for each row
 - Using wrong datasource: e.g. SQL for images rather than Azure Blob Storage
-- Azure Blob Storage: This is a much better option for storing images
 - Unoptimised media assets: Size and compress images
 - Too many screens and components in a single app
 - Outdated: Republish periodically to take advantage of MS updates
@@ -82,13 +81,13 @@ non-blocking.
 
 ##### Review App Settings
 
-- If OnStart is not used, consider disabling the property from settings
+If OnStart is not used, consider disabling the property from settings
 
 ### Data Loading Strategies
 
 #### Direct Data Source Binding
 
-When the items property of a gallery is set to a connector, of an expression is
+When the items property of a gallery is set to a connector, and an expression is
 used based on the table, then this is direct data source binding. Data will be
 retrieved from the connector as the criteria on the filter changes.
 
@@ -113,7 +112,7 @@ a call to ClearCollect.
 The main issue with this approach is that Collect and ClearCollect are not
 delegable so the Data row limit will apply.
 
-For not tabular connectors, we can also preload into a variable rather than a
+For non-tabular connectors, we can also preload into a variable rather than a
 collection using Set.
 
 #### Load from Persisted Storage

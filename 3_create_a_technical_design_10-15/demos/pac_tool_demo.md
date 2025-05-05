@@ -60,9 +60,6 @@ This command can then be run a second time with the managed flag set to true
 Since this is an intermediate step, before unpacking the solution, the output
 directory has been gitignored.
 
-This is an intermediate step before unpacking the solution, so the output file
-has been gitignored
-
 ![exported solution](./screens/pac/4_exported_solution.png)
 
 ### Unpack the Solution into Source Control

@@ -1,4 +1,4 @@
-# Create a Technical Design
+# Design Technical Architecture
 
 ## Intro
 
@@ -69,7 +69,7 @@ using an editable grid
 
 The alternatives to business rules are:
 
-- Plugins: For data validation logic
+- Plugins or realtime workflows: For data validation logic
 - Client Scripts: For display logic
 
 Note that business rules run BEFORE the onLoad event. If an exam question
@@ -127,8 +127,8 @@ calculated column or Now/UtcNow is used
 
 Calculated and formula columns only run logic on retrieve. The values of the
 columns will not be updated to reflect dirty data on a form. If we would like
-the values to be updated dynamically then a client side script may be considered
-as an alternative or a complimentary solution.
+the values to be updated dynamically then a client side script or business rule
+may be considered as alternatives or complimentary solutions.
 
 ##### Rollup Columns
 
@@ -233,7 +233,7 @@ We should use plugins when:
 
 ### API Management (APIM)
 
-APIM allows us to manage APIS across clouds and on premises. We can also use
+APIM allows us to manage APIs across clouds and on premises. We can also use
 APIM to export API definitions directly to Power Platform. When exported a
 custom connector will automatically be created.
 
@@ -281,7 +281,7 @@ We should use Power Automate when:
 
 Azure AI services is a collection of AI and cognitive APIs to add AI
 functionality to apps. Power Platform has an AI Builder service which is a low
-code option for some of the APIS. For more complex requirements we can use
+code option for some of the APIs. For more complex requirements we can use
 Azure AI services directly.
 
 ## Extend Power Platform with Developer Tools
@@ -422,7 +422,7 @@ made in the context of a person and only data they are allowed to see will be
 returned.
 
 Security roles are used to group a collection of privileges. These roles can be
-assigned to users, teams and business units. Privilege grands are accumulative
+assigned to users, teams and business units. Privilege grants are accumulative
 with the greatest access prevailing. Role assignments should be additive, we
 could not give broad access and then use role assignments to diminish access.
 
@@ -483,10 +483,10 @@ When shared, the user can access both the record and related records. But in
 both instances, they must still first pass the privilege check.
 
 A more advanced sharing concept is access teams. This provides for the
-auth-creation of a team and sharing record access with the team is based on an
+auto-creation of a team and sharing record access with the team is based on an
 Access Team Template which is a table of permissions to be applied. This is a
 more performant method of sharing because the team does not own records and
-security roles are not assigned to the team. Access is granted because the *
+security roles are not assigned to the team. Access is granted because the
 record is shared with the team and the user is a member.
 
 ##### Hierarchy Access
@@ -576,16 +576,16 @@ Some columns cannot be secured this way:
 
 ##### Column-Level Security: Calculated columns
 
-When a calculated column included a secured column, access to data may be given
+When a calculated column includes a secured column, access to data may be given
 unintentionally, so both should be secured.
 
 Similarly, composite columns inherit data from multiple columns, to secure this
 we would need to secure all columns that belong to it.
 
-###### Column-Level Security: Masking Rules
+##### Column-Level Security: Masking Rules
 
 Masking rules can be used to hide sensitive information, we can created masking
-rules in a solution. We use a regexp to define the masking rule and a character
+rules in a solution. We use a regex to define the masking rule and a character
 to be used for the masking.
 
 When a column is enabled for column security we can add a masking rule to be
@@ -636,5 +636,5 @@ If an app or flow violates an active DLP then the maker will be unable to save
 the app/flow. If a policy is activated which causes a previously saved app or
 flow to be in violation of the policy, the app/flow will not run.
 
-I can't find confirmation, but I understand that we can have multiple policies
-and if any of these are violated the app/flow will not work.
+If there are multiple policies, applying to a connector, the most restrictive
+policy will be applied.

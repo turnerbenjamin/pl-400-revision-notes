@@ -2,7 +2,7 @@
 
 ## Introduction
 
-ALM contains three key areas relating to an Application's lifecycle:
+ALM is a continuous loop of development activities:
 
 - Plan and Track
 - Develop
@@ -18,7 +18,7 @@ ALM contains three key areas relating to an Application's lifecycle:
 Environments are used to store, manage and share business data, apps and
 business processes. They are also containers to separate apps that may have
 different roles, security roles or target audiences. Each environment may have
-just one Dataverse Database.
+just one Dataverse database.
 
 ### Environment Types
 
@@ -86,7 +86,7 @@ organisations may have multiple test environments, e.g:
 ## Solutions
 
 Solutions are an important component of ALM in the PowerPlatform. They enable us
-to packaged components such as apps and tables. Solutions can then be
+to package components such as apps and tables. Solutions can then be
 transported between environments.
 
 A solution will not contain business data. It will contain:
@@ -202,14 +202,15 @@ exist when a component cannot exist without another
 other and then published. To remove this dependency, the association must be
 removed and the tables republished
 - Unpublished: These apply to the unpublished version of a publishable solution
-component that is being updated. One published it will be a published dependency
+component that is being updated. Once published it will be a published
+dependency
 
 Internal dependencies may lead to published dependencies. For example, columns
 in a table are dependent on the table. If a table is deleted then all columns
-will be deleted to along with any relationships. If we have a lookup field on
-a table form and then delete the primary table in the relationship, the deletion
-can not be completed until the lookup column has been removed from the related
-form and the form has been published.
+will be deleted to along with any relationships, this is an internal dependency.
+If we have a lookup field on a table form and then delete the primary table in
+the relationship, the deletion can not be completed until the lookup column has
+been removed from the related form and the form has been published.
 
 ### Solutions and Environment Variables
 
@@ -220,10 +221,10 @@ will override the default in the environment.
 This can be useful in ALM as we can use a variable, e.g. as the host for a
 connector and override this value as necessary in different environments.
 
-### Solution Segmentation
-
-Segmentation allows for granular development. Here, we would avoid selecting the
-Add All Assets option.
+We should not include a current value in an unmanaged environment. We will get
+a warning about this when entering a value. Once the solution is imported into
+another environment, the actual value of the environment variable in the target
+environment will be overridden.
 
 ### Patch Solutions
 
@@ -277,7 +278,7 @@ from source control.
 There are two paths that may be taken:
 
 First, the unmanaged solution can be exported and included, unpacked, in the
-source control system. Te build process will then import that packed solution
+source control system. The build process will then import that packed solution
 as unmanaged into a temporary build environment (sandbox). Finally, the solution
 will be exported as managed and stored as a build artifact in the source control
 system.
@@ -290,6 +291,10 @@ Note, if you simply export a solution into a file and add it to source control,
 it will be clear that something has changed but not what has changed. Automation
 can be used to unpack the file, create separate files for each part and add
 these to source control. This enables us to see a detailed log of all changes.
+
+The second option, exporting as both managed and unmanaged and unpacking with
+packagetype set to both is demonstrated
+[here](../3_create_a_technical_design_10-15/demos/pac_tool_demo.md)
 
 ### Automate Solution Management
 
@@ -319,3 +324,6 @@ operations include:
 - Pack Solution
 - Set Solution Version
 - Create, Delete and Copy Environments
+
+When using Azure Pipelines, the first task will generally be to install these
+build tools.

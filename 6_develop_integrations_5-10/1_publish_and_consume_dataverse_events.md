@@ -134,7 +134,7 @@ Webhooks should be used when:
 - Entire transaction should fail unless external service returns successfully
 - Third party Web API endpoint already exists to be used for integration
 purposes
-- Shared Access Signatures are no preferred or feasible
+- Shared Access Signatures are not preferred or feasible
 
 ### Webhook Authentication Options
 

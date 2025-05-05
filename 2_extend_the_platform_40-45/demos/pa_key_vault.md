@@ -11,10 +11,6 @@ permission model. To create keys, I granted myself the key vault admin role:
 
 ![rbac](./screens/pa/kv/2_rbac.png)
 
-When the vault was created, I used Azure role-based access control (RBAC) as the
-permission model. To work with the vault, I granted myself the Key Vault
-Administrator role.
-
 Next, a secret can be added to the vault:
 
 ![create secret](./screens/pa/kv/3_secret_creation.png)

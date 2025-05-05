@@ -297,7 +297,7 @@ can resolve these by fixing the connection.
 
 ### Action Configuration Issues
 
-These issues will generally be indicated by 404 or 404 errors, we should
+These issues will generally be indicated by 400 or 404 errors, we should
 investigate the error message to determine how to fix the flow
 
 ### Temporary Issues
@@ -320,12 +320,12 @@ Each account can have up to:
 - 50 custom connectors
 - 20 connections per API and 100 connections in total
 
-In addition, some connectors, e.g. C, implement connection throttling.
+In addition, some connectors, e.g. X, implement connection throttling.
 
 ## Expressions in Power Automate
 
 For more complex operations, e.g. calculations and data transformation, we will
-need to use expressions. FLows in Power Automate run on top of Azure Logic Apps
+need to use expressions. Flows in Power Automate run on top of Azure Logic Apps
 and both use the same functions.
 
 ### Writing Expressions
@@ -392,8 +392,8 @@ runs.
 ### Using Azure Key Vault
 
 Marking inputs and outputs as secure will remove them from the logs. However, if
-we edit the flow hardcoded values will still be visible. In addition, if these
-values expire then we will need to update them everywhere that they are used.
+we edit the flow, hardcoded values will still be visible. In addition, if these
+values expire, we will need to update them everywhere that they are used.
 
 To resolve this we can use Azure Key Vault to store the values and access these
 with the Azure Key Vault connector. We can create a connection as an interactive
@@ -424,7 +424,7 @@ provide more granular error handling as required.
 
 ### Scopes
 
-We can use a scope control to group related actions. A common policy is to
+We can use a scope control to group related actions. A common pattern is to
 define try, catch and finally scopes to handle errors. Try would represent the
 success path.
 

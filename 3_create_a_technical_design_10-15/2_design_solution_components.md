@@ -71,10 +71,11 @@ Let's say we have an external application that needs to notify Power Apps to
 create a new contact. A pattern we might use here would be:
 
 - External application adds a message to a service bus queue
-- An Azure function listens for a message and use the .Net sdk to perform the
+- An Azure function listens for a message and use the .Net SDK to perform the
 operation using managed identities for authentication to remove need for secrets
 
-The related service principle we need the appropriate permissions in Dataverse.
+The related service principle will need the appropriate permissions in
+Dataverse.
 
 We may also want to implement a plugin to validate the contacts created and
 alternate keys to help prevent duplicates.
@@ -91,7 +92,7 @@ functionality provided by service bus
 Let's say that we have an excel file containing data that we need to bulk import
 into the Dataverse. One solution would be to:
 
-- Import input file into a Azure Sql database as a staging table
+- Import input file into a Azure SQL database as a staging table
 - Use a logic app with a Dataverse connector to read rows from the table and
 write to Dataverse
 - Azure Data Factory can be used to manage the pipeline
@@ -164,7 +165,7 @@ Security is managed using Shared Access Signatures (SAS)
 
 Webhooks are a HTTP pattern for connecting web apis and services with a publish-
 subscribe models. Webhooks enable both synchronous and asynchronous steps. As
-wit Service Endpoint we can register a webhook and step with no code or use a
+with Service Endpoint, we can register a webhook and step with no code or use a
 plugin/custom workflow to trigger the webhook.
 
 Webhooks will timeout after 60 seconds.
