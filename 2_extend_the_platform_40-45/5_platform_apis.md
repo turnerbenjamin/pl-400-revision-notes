@@ -97,7 +97,6 @@ parameter which may be used to perform grouping and aggregation, however, there
 are various limitations to the Dataverse implementation of $apply:
 
 - Distinct count not supported with count column
-- Per query limits not supported
 - Grouping by parts of a date always uses UTC
 - No support for per query limits
 

@@ -17,7 +17,7 @@ directory of the application, as follows:
 
 ```
 CLIENT_ID=
-TENANT_ID= {YOUR_TENANT_ID}
+TENANT_ID={YOUR_TENANT_ID}
 CLIENT_SECRET=
 ENVIRONMENT_URL={YOUR_INSTANCE URL}
 API_PATH=api/data/v9.2/
@@ -27,7 +27,7 @@ AUTHORITY=https://login.microsoftonline.com/
 The two parameters, YOUR_TENANT_ID and YOUR_INSTANCE_URL can be accessed by
 navigating to make.powerapps and selecting Session Details from the advanced
 settings. CLIENT_ID and CLIENT_SECRET have been left intentionally blank. Once
-the .ev file has been set-up, run the application:
+the .env file has been set-up, run the application:
 
 ```bash
 go run main.go

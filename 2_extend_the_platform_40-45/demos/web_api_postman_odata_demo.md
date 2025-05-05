@@ -109,3 +109,12 @@ Delete would be as above, but:
 
 - HTTP Method: DELETE
 - Empty body
+
+## Fetch Xml
+
+FetchXml is not part of the OData standard, it is an MS extension. For this
+demonstration, the FetchXml used for the
+[plug-ins retrieve multiple demo](./plug_ins_retreive_multiple.md) has been
+recycled for use with the WebApi:
+
+![fetchXml](./screens/pod_9_fetch_xml.png)
