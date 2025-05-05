@@ -2,11 +2,12 @@
 
 ## Introduction
 
-Power automate flows are a asynchronous declarative solution.
+Power automate flows are an asynchronous declarative solution.
 
 ## Authentication
 
-When using a Dataverse connector, we can set up a connection to use:
+Dataverse connectors are set-up to authenticate with OAuth. They also support
+authentication with a service principal:
 
 - OAuth: Used when connection for an interactive user using an Entra ID
 organisation account; e.g. user productivity flows
@@ -51,10 +52,10 @@ triggerBody()?['SdkMessage']
 
 ##### Select Columns
 
-This applies when the change type included modified rows. It can be used to
-filter modification events that will trigger the flow. For instance, if we
-define select columns as firstname,lastname then only updates affecting one or
-both of these columns will trigger the flow.
+This applies when the change type includes "modified". It can be used to filter
+modification events that will trigger the flow. For instance, if we define
+select columns as firstname,lastname then only updates affecting one or both of
+these columns will trigger the flow.
 
 ##### Filter Rows
 
@@ -218,6 +219,8 @@ This is a general use action. It is:
 - Premium
 
 We provide a response as JSON and generate a schema.
+
+The use of both actions is demonstrated [here](./demos/pa_response.md)
 
 ## Flow Permissions
 

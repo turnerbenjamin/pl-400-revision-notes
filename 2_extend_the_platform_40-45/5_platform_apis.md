@@ -229,7 +229,7 @@ errors automatically. This class is in the Crm.Tooling.Connector library.
 
 ### Transactions and Locks
 
-The protect the integrity of the database, operations are preformed within a
+The protect the integrity of the database, operations are performed within a
 transaction. Each request will place locks on resources which will not be
 released until the transaction has been committed or aborted. For instance:
 
@@ -256,10 +256,10 @@ acted on independently.
 
 #### Transactions and Web Service Requests
 
-With plug-ins, it is the execution context that maintains the execution context.
+With plug-ins, the execution context that maintains the transaction context.
 External requests with web services will create a pipeline with transaction
 handling but the transaction will close once the response is returned. In this
-scenario, there are two messages that may be used to perform multiple actions
+scenario, there are two methods that may be used to perform multiple actions
 within a single request:
 
 ##### ExecuteMultiple
