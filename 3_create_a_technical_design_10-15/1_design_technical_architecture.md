@@ -110,7 +110,7 @@ These columns are used to perform calculations, we can specify conditions and
 actions. In the action section we can define a calculation using data in the
 table and related tables.
 
-These are being depreciated in favour of formula columns:
+These are being depreciated in favour of formula columns.
 
 ##### Formula Columns
 
@@ -150,6 +150,8 @@ Workflows and plugins have different capabilities and limitations:
 can only run asynchronously
 - Workflows cannot not be scheduled
 - Workflows cannot access external data sources with connectors
+
+Power Platform recommend using Power Automate over background (async) workflows.
 
 Imperative alternatives include:
 
@@ -407,7 +409,7 @@ There are two types of record ownership:
 This is defined when the table is created and cannot be changed.
 
 With records that are organisation owned, the only access level choices are
-whether the user can perform and operation or not. For records that are user/
+whether the user can perform an operation or not. For records that are user/
 team owned, access level choices are tiered allowing for row level security.
 This is covered in more detail below.
 
